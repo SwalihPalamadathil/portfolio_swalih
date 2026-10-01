@@ -7,24 +7,78 @@ const STARTER_QUESTIONS = [
   "is he looking for an internship?"
 ];
 
-// Hand-drawn doodle marks
-function PenDoodle() {
+const ROTATING_PROMPTS = [
+  "about CamMap, skills, or experience",
+  "what I'm currently learning",
+  "or just say hi!"
+];
+
+// Hand-drawn speech-scribble doodle mark
+function SpeechScribbleDoodle({ shouldReduceMotion }) {
   return (
     <svg
-      className="hero-chat-doodle-icon"
-      viewBox="0 0 20 20"
-      width="14"
-      height="14"
+      className="hero-chat-speech-doodle"
+      viewBox="0 0 26 24"
+      width="22"
+      height="20"
       fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
       aria-hidden="true"
     >
-      <path d="M 3 17 L 6.8 15.8 L 15.5 7.1 C 16.5 6.1, 16.5 4.5, 15.5 3.5 C 14.5 2.5, 12.9 2.5, 11.9 3.5 L 3.2 12.2 Z" />
-      <path d="M 11.2 4.2 L 14.8 7.8" />
-      <path d="M 3 17 L 4.2 13.8" />
+      {/* Hand-drawn irregular speech bubble contour */}
+      <path
+        d="M 3.2 5.5 C 3 3.8, 4.4 2.4, 7.2 2.2 C 13.5 1.8, 19.2 2.1, 22.4 2.8 C 24.2 3.3, 24.8 4.8, 24.6 7.4 C 24.3 10.8, 24.4 13.5, 23 15.6 C 21.8 17.2, 19.6 17.5, 15.5 17.5 L 12.8 21.5 C 12.1 22.5, 10.8 22, 11.2 20.5 L 11.8 17.5 C 7 17.4, 4.6 16.9, 3.5 15.2 C 2.3 13.2, 2.6 9.5, 3.2 5.5 Z"
+        className="hero-chat-bubble-outline"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* Living scribble thought stroke */}
+      <motion.path
+        d="M 6.8 9.5 C 9 7.2, 11.2 11.8, 13.8 9.2 C 15.8 7.2, 17.8 11.2, 19.5 9"
+        className="hero-chat-scribble-stroke"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        animate={
+          shouldReduceMotion
+            ? { pathLength: 1, opacity: 1 }
+            : {
+              pathLength: [0, 1, 1, 0],
+              opacity: [0.35, 1, 1, 0.35],
+              transition: {
+                duration: 4.4,
+                repeat: Infinity,
+                ease: 'easeInOut',
+                times: [0, 0.45, 0.85, 1]
+              }
+            }
+        }
+      />
+      {/* Secondary micro-tick */}
+      <motion.path
+        d="M 8 13.5 C 10.5 12.4, 13 14, 16 13"
+        className="hero-chat-scribble-stroke-sub"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.35"
+        strokeLinecap="round"
+        animate={
+          shouldReduceMotion
+            ? { pathLength: 1, opacity: 0.85 }
+            : {
+              pathLength: [0, 1, 1, 0],
+              opacity: [0.2, 0.85, 0.85, 0.2],
+              transition: {
+                duration: 4.4,
+                repeat: Infinity,
+                ease: 'easeInOut',
+                times: [0.15, 0.55, 0.85, 1]
+              }
+            }
+        }
+      />
     </svg>
   );
 }
@@ -118,11 +172,23 @@ export default function HeroChat() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorNotice, setErrorNotice] = useState(null);
   const [isRateLimited, setIsRateLimited] = useState(false);
+  const [promptIndex, setPromptIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const containerRef = useRef(null);
   const idCounterRef = useRef(0);
+
+  // Rotate micro-copy every 4.5s when idle, unhovered, and before first interaction
+  useEffect(() => {
+    if (shouldReduceMotion || isExpanded || hasInteracted || isHovered) return;
+    const interval = setInterval(() => {
+      setPromptIndex((prev) => (prev + 1) % ROTATING_PROMPTS.length);
+    }, 4500);
+    return () => clearInterval(interval);
+  }, [shouldReduceMotion, isExpanded, hasInteracted, isHovered]);
 
   // Auto-scroll inside message list when new messages arrive
   useEffect(() => {
@@ -224,45 +290,52 @@ export default function HeroChat() {
     >
       <AnimatePresence mode="wait">
         {!isExpanded ? (
-          /* RESTING STATE: Compact, Hand-drawn Sticky Note Prompt */
+          /* RESTING STATE: Catchy, Hand-drawn Sticky Note Prompt */
           <motion.button
             key="resting-note"
             type="button"
             className="hero-chat-resting-note"
-            onClick={() => setIsExpanded(true)}
+            onClick={() => {
+              setHasInteracted(true);
+              setIsExpanded(true);
+            }}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            onFocus={() => setIsHovered(true)}
+            onBlur={() => setIsHovered(false)}
             aria-label="Ask me anything about my work — click to open chat"
             aria-expanded="false"
-            initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 10 }}
+            initial={{
+              opacity: 0,
+              y: shouldReduceMotion ? 0 : 16,
+              rotate: shouldReduceMotion ? 0 : -2.8
+            }}
             animate={
               shouldReduceMotion
-                ? { opacity: 1, y: 0 }
+                ? { opacity: 1, y: 0, rotate: 0 }
                 : {
-                    opacity: 1,
-                    y: 0,
-                    rotate: [-1.2, -1.2, -0.2, -1.2],
-                    transition: {
-                      y: { duration: 0.45, ease: [0.16, 1, 0.3, 1] },
-                      opacity: { duration: 0.45 },
-                      rotate: {
-                        repeat: Infinity,
-                        repeatDelay: 8.5,
-                        duration: 1.2,
-                        ease: 'easeInOut'
-                      }
-                    }
+                  opacity: 1,
+                  y: [16, -2, 0, 0, -1.5, 0],
+                  rotate: [-2.8, -0.6, -1.2, -1.2, -0.7, -1.2],
+                  transition: {
+                    duration: 2.2,
+                    delay: 0.35,
+                    times: [0, 0.22, 0.32, 0.78, 0.88, 1],
+                    ease: 'easeInOut'
                   }
+                }
             }
             exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.15 } }}
             whileHover={
               shouldReduceMotion
                 ? {}
                 : {
-                    rotate: 0,
-                    y: -2,
-                    transition: { duration: 0.2, ease: 'easeOut' }
-                  }
+                  rotate: 0,
+                  y: -2.5,
+                  transition: { duration: 0.2, ease: 'easeOut' }
+                }
             }
-            whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
+            whileTap={shouldReduceMotion ? {} : { scale: 0.985, y: -0.5 }}
           >
             {/* Hand-drawn Irregular Border SVG Frame */}
             <svg
@@ -272,22 +345,35 @@ export default function HeroChat() {
               aria-hidden="true"
             >
               <path
-                d="M 2.5 3 C 25 1.5, 75 2.2, 97.5 3 C 98.5 25, 97.8 75, 98 97 C 75 98.2, 25 97.4, 2 97 C 2.8 75, 1.6 25, 2.5 3 Z"
+                d="M 2 3 C 26 1.4, 74 2.2, 98 2.8 C 98.8 25, 98.2 75, 98.4 97 C 74 98.2, 26 97.4, 1.8 97.2 C 2.4 75, 1.4 25, 2 3 Z"
                 vectorEffect="non-scaling-stroke"
-                fill="var(--bg-raised)"
-                stroke="var(--ink-muted)"
-                strokeWidth="1.45"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+                className="hero-chat-frame-path"
               />
             </svg>
 
             <span className="hero-chat-resting-content">
               <span className="hero-chat-resting-icon" aria-hidden="true">
-                <PenDoodle />
+                <SpeechScribbleDoodle shouldReduceMotion={shouldReduceMotion} />
               </span>
-              <span className="hero-chat-resting-text">
-                ask me anything about my work
+              <span className="hero-chat-resting-copy">
+                <span className="hero-chat-invite-row">
+                  <span className="hero-chat-invite-title">Ask me anything</span>
+                  <span className="hero-chat-prompt-chevron" aria-hidden="true">›</span>
+                </span>
+                <span className="hero-chat-detail-viewport">
+                  <AnimatePresence mode="wait">
+                    <motion.span
+                      key={promptIndex}
+                      className="hero-chat-detail-text"
+                      initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 3 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: shouldReduceMotion ? 0 : -3 }}
+                      transition={{ duration: shouldReduceMotion ? 0.05 : 0.28, ease: 'easeOut' }}
+                    >
+                      {ROTATING_PROMPTS[promptIndex]}
+                    </motion.span>
+                  </AnimatePresence>
+                </span>
               </span>
             </span>
           </motion.button>
