@@ -83,7 +83,18 @@ export default async function handler(req, res) {
   }
 
   let body = req.body;
-  if (typeof body === 'string') {
+  if (body === undefined && typeof req.on === 'function') {
+    try {
+      const chunks = [];
+      for await (const chunk of req) {
+        chunks.push(chunk);
+      }
+      const raw = Buffer.concat(chunks).toString();
+      body = raw ? JSON.parse(raw) : {};
+    } catch {
+      body = {};
+    }
+  } else if (typeof body === 'string') {
     try {
       body = JSON.parse(body);
     } catch {
@@ -108,9 +119,9 @@ export default async function handler(req, res) {
   ];
 
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
     if (!apiKey) {
-      throw new Error('No GEMINI_API_KEY found in process.env (check .env.local)');
+      throw new Error('No GEMINI_API_KEY found in process.env (check Vercel Environment Variables or .env.local)');
     }
 
     // Fast/cheap Flash ids as of Sep 2026. 2.5-flash is retired for new API keys.
