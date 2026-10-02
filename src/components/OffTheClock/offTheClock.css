@@ -1,0 +1,1037 @@
+/* ==========================================================================
+   OFF THE CLOCK — EDITORIAL DESIGN SYSTEM & STYLES (REVISED V2)
+   ========================================================================== */
+
+:root {
+  --font-handwriting: 'Caveat', cursive, sans-serif;
+}
+
+/* --------------------------------------------------------------------------
+   1. Section Layout & Paper Surface
+   -------------------------------------------------------------------------- */
+.otc-section {
+  position: relative;
+  background-color: var(--bg);
+  color: var(--ink);
+  padding-top: clamp(4.5rem, 8vw, 7rem);
+  padding-bottom: clamp(4.5rem, 8vw, 7rem);
+  border-bottom: 1px solid var(--border-hairline);
+  overflow-x: hidden;
+}
+
+/* Subtle paper grain texture overlay (pure SVG noise at 3.5% opacity) */
+.otc-grain-texture {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='otcGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23otcGrain)' opacity='0.035'/%3E%3C/svg%3E");
+}
+
+.otc-container {
+  position: relative;
+  z-index: 1;
+}
+
+/* --------------------------------------------------------------------------
+   2. Section Header
+   -------------------------------------------------------------------------- */
+.otc-header {
+  margin-bottom: clamp(1.75rem, 3.5vw, 2.5rem);
+}
+
+.otc-wayfinding {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--ink-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.otc-title-wrapper {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 0.35rem;
+}
+
+.otc-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.5rem, 4.5vw, 3.85rem);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  margin: 0;
+}
+
+.otc-title-swoosh {
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 100%;
+  max-width: 220px;
+  height: 12px;
+  pointer-events: none;
+}
+
+.otc-subtitle {
+  font-family: var(--font-handwriting);
+  font-size: clamp(1.4rem, 2.3vw, 1.85rem);
+  color: var(--ink-muted);
+  font-weight: 500;
+  line-height: 1.25;
+  margin: 0.4rem 0 0 0;
+}
+
+.otc-lead-note {
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  color: var(--ink-muted);
+  margin-top: 0.4rem;
+  max-width: 60ch;
+  line-height: 1.5;
+}
+
+/* --------------------------------------------------------------------------
+   3. Photo Booth Component
+   -------------------------------------------------------------------------- */
+.otc-photobooth {
+  margin-bottom: clamp(3.5rem, 6vw, 5rem);
+}
+
+/* Tidy Controls Toolbar (Filter chips deleted, tight gap) */
+.otc-booth-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px dashed var(--border-hairline);
+}
+
+.otc-toolbar-hint {
+  font-family: var(--font-handwriting);
+  font-size: 1.25rem;
+  color: var(--ink-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.otc-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.otc-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.95rem;
+  background: #FFFFFF;
+  border: 1px solid var(--border-medium);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--ink);
+  cursor: pointer;
+  min-height: 44px;
+  transition: background 0.2s ease, transform 0.15s ease, border-color 0.2s ease;
+  user-select: none;
+}
+
+.otc-icon-btn:hover {
+  background: var(--bg-raised);
+  border-color: var(--ink);
+}
+
+.otc-icon-btn:active {
+  transform: translateY(1px);
+}
+
+.otc-icon-btn:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.otc-icon-btn.is-active {
+  background: var(--ink);
+  color: #FFFFFF;
+  border-color: var(--ink);
+}
+
+/* View toggle switch */
+.otc-view-toggle {
+  display: inline-flex;
+  background: var(--bg-raised);
+  border: 1px solid var(--border-hairline);
+  padding: 3px;
+  border-radius: 6px;
+  gap: 2px;
+}
+
+.otc-toggle-btn {
+  padding: 0.4rem 0.85rem;
+  border: none;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+  border-radius: 4px;
+  cursor: pointer;
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.otc-toggle-btn.is-active {
+  background: #FFFFFF;
+  color: var(--ink);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(22, 21, 15, 0.08);
+}
+
+/* Pinned Board Grid Surface */
+.otc-board {
+  position: relative;
+  min-height: 480px;
+  padding: 1.5rem 0.5rem;
+  border-radius: 8px;
+}
+
+.otc-board-pinned {
+  background-image: radial-gradient(var(--border-hairline) 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
+}
+
+/* Scatter Grid - strictly aligned cards */
+.otc-scatter-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.75rem 1.25rem;
+  align-items: stretch;
+}
+
+@media (min-width: 768px) {
+  .otc-scatter-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2.25rem 1.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .otc-scatter-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2.5rem 2rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .otc-scatter-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2.75rem 2rem;
+  }
+
+  /* Intentionally center the last two cards (13 and 14) in the 4-column layout */
+  .otc-scatter-grid > .otc-polaroid:nth-child(13) {
+    grid-column: 2;
+  }
+}
+
+/* Polaroid Card - Fixed Identical Geometry */
+.otc-polaroid {
+  position: relative;
+  background: #FFFFFF;
+  padding: 10px 10px 14px 10px;
+  border: 1px solid rgba(22, 21, 15, 0.07);
+  border-radius: 2px;
+  box-shadow: 0 4px 14px -2px rgba(22, 21, 15, 0.08), 0 1px 3px 0 rgba(22, 21, 15, 0.04);
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: box-shadow 0.25s var(--ease-editorial);
+}
+
+.otc-polaroid:hover {
+  box-shadow: 0 14px 28px -6px rgba(22, 21, 15, 0.16), 0 3px 8px -1px rgba(22, 21, 15, 0.08);
+}
+
+.otc-polaroid:active {
+  cursor: grabbing;
+}
+
+/* Washi Tape Variations */
+.otc-tape {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  width: 68px;
+  height: 20px;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0.88;
+}
+
+.otc-tape-lime {
+  transform: translateX(-50%) rotate(-1.5deg);
+  background: rgba(198, 242, 78, 0.85);
+  border-left: 2px dashed rgba(22, 21, 15, 0.12);
+  border-right: 2px dashed rgba(22, 21, 15, 0.12);
+}
+
+.otc-tape-cream {
+  transform: translateX(-50%) rotate(1.2deg);
+  background: rgba(239, 235, 225, 0.95);
+  border-left: 2px dashed rgba(22, 21, 15, 0.12);
+  border-right: 2px dashed rgba(22, 21, 15, 0.12);
+}
+
+.otc-tape-kraft {
+  transform: translateX(-50%) rotate(-0.8deg);
+  background: rgba(210, 180, 140, 0.88);
+  border-left: 2px dashed rgba(22, 21, 15, 0.12);
+  border-right: 2px dashed rgba(22, 21, 15, 0.12);
+}
+
+/* Fixed 4:5 Aspect Ratio Photo Container */
+.otc-polaroid-photo-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  background: var(--bg-raised);
+  overflow: hidden;
+  border: 1px solid rgba(22, 21, 15, 0.09);
+}
+
+.otc-polaroid-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s var(--ease-editorial);
+}
+
+.otc-polaroid:hover .otc-polaroid-img {
+  transform: scale(1.03);
+}
+
+/* Subtle Zoom Badge */
+.otc-polaroid-zoom-badge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(22, 21, 15, 0.72);
+  color: #FFFFFF;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+}
+
+.otc-polaroid:hover .otc-polaroid-zoom-badge,
+.otc-polaroid:focus-within .otc-polaroid-zoom-badge {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+@media (pointer: coarse) {
+  .otc-polaroid-zoom-badge {
+    opacity: 0.65;
+  }
+}
+
+/* Fixed Height Polaroid Caption Footer */
+.otc-polaroid-footer {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 58px;
+  min-height: 58px;
+}
+
+.otc-polaroid-caption {
+  font-family: var(--font-handwriting);
+  font-size: 1.25rem;
+  line-height: 1.2;
+  color: var(--ink);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+@media (min-width: 1024px) {
+  .otc-polaroid-caption {
+    font-size: 1.3rem;
+    white-space: nowrap;
+    -webkit-line-clamp: 1;
+  }
+}
+
+.otc-polaroid-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 2px;
+}
+
+.otc-polaroid-tag {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80%;
+}
+
+.otc-polaroid-num {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--ink-faint);
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   4. Contact Sheet Mode (14 frames grid)
+   -------------------------------------------------------------------------- */
+.otc-contact-sheet {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  background: #191815;
+  padding: 1.5rem;
+  border-radius: 6px;
+  border: 1px solid rgba(22, 21, 15, 0.4);
+}
+
+@media (min-width: 640px) {
+  .otc-contact-sheet {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .otc-contact-sheet {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  .otc-contact-sheet {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+.otc-contact-frame {
+  position: relative;
+  background: #23221E;
+  padding: 8px 8px 10px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.otc-contact-frame:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+}
+
+.otc-contact-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 5px;
+}
+
+.otc-contact-num {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.otc-contact-tag-badge {
+  font-size: 0.5625rem;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.otc-contact-thumb {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  display: block;
+}
+
+.otc-contact-caption {
+  font-family: var(--font-handwriting);
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.88);
+  margin-top: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --------------------------------------------------------------------------
+   5. Lightbox Modal (Viewport-safe max 80dvh, solid dark)
+   -------------------------------------------------------------------------- */
+.otc-lightbox-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(22, 21, 15, 0.88);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+}
+
+.otc-lightbox-dialog {
+  position: relative;
+  max-width: 600px;
+  width: 100%;
+  max-height: 92dvh;
+  outline: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.otc-lightbox-card {
+  background: #FFFFFF;
+  padding: 14px 14px 18px 14px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+}
+
+.otc-lightbox-photo-wrap {
+  width: 100%;
+  max-height: 60dvh;
+  background: var(--bg-raised);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid rgba(22, 21, 15, 0.08);
+}
+
+.otc-lightbox-img {
+  width: 100%;
+  max-height: 60dvh;
+  object-fit: contain;
+  display: block;
+}
+
+.otc-lightbox-footer {
+  margin-top: 12px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.otc-lightbox-caption {
+  font-family: var(--font-handwriting);
+  font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+  line-height: 1.2;
+  color: var(--ink);
+  margin: 0;
+}
+
+.otc-lightbox-tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+
+.otc-lightbox-counter {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--ink-faint);
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+/* Lightbox Thumbnails Strip */
+.otc-lightbox-thumbs {
+  display: none;
+  margin-top: 12px;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 4px;
+  scrollbar-width: none;
+}
+
+@media (min-width: 640px) {
+  .otc-lightbox-thumbs {
+    display: flex;
+  }
+}
+
+.otc-lightbox-thumb-btn {
+  flex: 0 0 46px;
+  height: 46px;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  overflow: hidden;
+  opacity: 0.6;
+  transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+
+.otc-lightbox-thumb-btn:hover,
+.otc-lightbox-thumb-btn.is-active {
+  opacity: 1;
+  border-color: var(--accent);
+}
+
+.otc-lightbox-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Lightbox Nav & Close */
+.otc-lightbox-close {
+  position: absolute;
+  top: -44px;
+  right: 0;
+  background: transparent;
+  border: none;
+  color: #FFFFFF;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
+  transition: transform 0.2s ease;
+}
+
+.otc-lightbox-close:hover {
+  transform: scale(1.1);
+}
+
+.otc-lightbox-nav {
+  position: absolute;
+  top: 45%;
+  transform: translateY(-50%);
+  background: rgba(22, 21, 15, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #FFFFFF;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.otc-lightbox-nav:hover {
+  background: rgba(22, 21, 15, 0.95);
+  transform: translateY(-50%) scale(1.08);
+}
+
+.otc-lightbox-prev {
+  left: -58px;
+}
+
+.otc-lightbox-next {
+  right: -58px;
+}
+
+@media (max-width: 768px) {
+  .otc-lightbox-prev {
+    left: 8px;
+  }
+  .otc-lightbox-next {
+    right: 8px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   6. Subtle Hand-Drawn Section Divider
+   -------------------------------------------------------------------------- */
+.otc-section-divider {
+  width: 100%;
+  max-width: 800px;
+  margin: clamp(3rem, 6vw, 4.5rem) auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.otc-divider-svg {
+  width: 100%;
+  height: 12px;
+}
+
+/* --------------------------------------------------------------------------
+   7. Doodle Corner & Interactive Notebook
+   -------------------------------------------------------------------------- */
+.otc-doodle-corner {
+  background: #FFFFFF;
+  border: 1px solid var(--border-medium);
+  border-radius: 8px;
+  padding: clamp(1.5rem, 3.5vw, 2.75rem);
+  box-shadow: 0 4px 18px -2px rgba(22, 21, 15, 0.05);
+  position: relative;
+}
+
+.otc-notebook-ruled {
+  background-image: linear-gradient(var(--border-hairline) 1px, transparent 1px);
+  background-size: 100% 30px;
+}
+
+.otc-doodle-head {
+  margin-bottom: 2rem;
+}
+
+.otc-doodle-title {
+  font-family: var(--font-handwriting);
+  font-size: clamp(2rem, 3.2vw, 2.75rem);
+  color: var(--ink);
+  font-weight: 600;
+  margin: 0 0 0.35rem 0;
+  line-height: 1.2;
+}
+
+.otc-doodle-subtitle {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: var(--ink-muted);
+  margin: 0;
+}
+
+/* 8 Doodles Grid: 2 clean rows of 4 on desktop, 2 cols on mobile */
+.otc-doodles-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem 1.25rem;
+  margin-bottom: 2.5rem;
+}
+
+@media (min-width: 768px) {
+  .otc-doodles-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2.25rem 1.75rem;
+  }
+}
+
+.otc-doodle-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0.75rem;
+  border-radius: 6px;
+  transition: transform 0.25s var(--ease-editorial);
+}
+
+.otc-doodle-card:hover {
+  transform: translateY(-3px) scale(1.03);
+}
+
+.otc-doodle-svg {
+  width: 86px;
+  height: 86px;
+  display: block;
+}
+
+.otc-doodle-label {
+  font-family: var(--font-handwriting);
+  font-size: 1.25rem;
+  color: var(--ink);
+  margin-top: 0.4rem;
+  line-height: 1.1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+/* Sticky notes row */
+.otc-sticky-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  margin: 2rem 0;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px dashed var(--border-hairline);
+}
+
+.otc-sticky-note {
+  position: relative;
+  background: #FAF7EE;
+  padding: 18px 20px 14px 20px;
+  border: 1px solid rgba(22, 21, 15, 0.12);
+  box-shadow: 0 4px 10px rgba(22, 21, 15, 0.06);
+  border-radius: 2px;
+  max-width: 280px;
+}
+
+.otc-sticky-tilt-left {
+  transform: rotate(-1.5deg);
+}
+
+.otc-sticky-tilt-right {
+  transform: rotate(1.2deg);
+}
+
+.otc-sticky-text {
+  font-family: var(--font-handwriting);
+  font-size: 1.3rem;
+  color: var(--ink);
+  line-height: 1.25;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   8. Upgraded Interactive Sketchpad
+   -------------------------------------------------------------------------- */
+.otc-sketchpad-section {
+  padding-top: 1rem;
+}
+
+.otc-sketchpad-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.otc-sketchpad-title {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.otc-sketchpad-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.otc-swatches-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-right: 6px;
+  border-right: 1px solid var(--border-hairline);
+}
+
+.otc-color-pill {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.otc-color-pill.is-active {
+  transform: scale(1.2);
+  border-color: var(--ink);
+}
+
+.otc-sizes-group {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding-right: 6px;
+  border-right: 1px solid var(--border-hairline);
+}
+
+.otc-size-btn {
+  padding: 0.35rem 0.65rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  border: 1px solid var(--border-medium);
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--ink-muted);
+  min-height: 36px;
+}
+
+.otc-size-btn.is-active {
+  background: var(--ink);
+  color: #FFFFFF;
+  border-color: var(--ink);
+}
+
+.otc-stamps-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.otc-stamps-label {
+  font-family: var(--font-handwriting);
+  font-size: 1.15rem;
+  color: var(--ink-muted);
+}
+
+.otc-stamp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0.35rem 0.75rem;
+  background: #FFFFFF;
+  border: 1px dashed var(--border-medium);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 34px;
+}
+
+.otc-stamp-btn:hover {
+  background: var(--bg-raised);
+  border-color: var(--ink);
+  transform: translateY(-1px);
+}
+
+.otc-canvas-wrap {
+  width: 100%;
+  height: 270px;
+  min-height: 260px;
+  background: #FAF8F3;
+  border: 1px solid var(--border-medium);
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 2px 6px rgba(22, 21, 15, 0.04);
+}
+
+.otc-drawing-canvas {
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: crosshair;
+  display: block;
+}
+
+.otc-canvas-hint {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  font-family: var(--font-handwriting);
+  font-size: 1.25rem;
+  color: var(--ink-faint);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* --------------------------------------------------------------------------
+   9. Click Spark Effect (Section-scoped)
+   -------------------------------------------------------------------------- */
+.otc-spark-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 50;
+}
+
+.otc-spark-dot {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  background: var(--ink);
+}
+
+/* --------------------------------------------------------------------------
+   10. Mobile and Small Screen Adjustments (< 430px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 430px) {
+  .otc-scatter-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem 0.75rem;
+  }
+  .otc-polaroid {
+    padding: 8px 8px 10px 8px;
+  }
+  .otc-polaroid-caption {
+    font-size: 1.05rem;
+  }
+  .otc-polaroid-footer {
+    height: 52px;
+    min-height: 52px;
+  }
+  .otc-doodles-grid {
+    gap: 1rem 0.75rem;
+  }
+  .otc-doodle-svg {
+    width: 72px;
+    height: 72px;
+  }
+  .otc-doodle-label {
+    font-size: 1.1rem;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   11. Reduced Motion Accessibility
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .otc-doodle-card:hover {
+    transform: none !important;
+  }
+  .otc-polaroid {
+    transition: none !important;
+  }
+  .otc-title-swoosh path {
+    transition: none !important;
+  }
+}

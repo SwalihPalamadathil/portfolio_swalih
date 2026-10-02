@@ -7,6 +7,7 @@ import About from './sections/About';
 import Skills from './sections/Skills';
 import Work from './sections/Work';
 import Experience from './sections/Experience';
+import OffTheClock from './components/OffTheClock/OffTheClock';
 import Contact from './sections/Contact';
 
 export default function App() {
@@ -20,6 +21,7 @@ export default function App() {
           <Skills />
           <Work />
           <Experience />
+          <OffTheClock />
           <Contact />
         </main>
         <Footer />
