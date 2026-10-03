@@ -12,7 +12,7 @@ import {
   Bug,
   Coffee
 } from 'lucide-react';
-import { doodleHeader } from '../../data/offTheClock';
+import { doodleHeader, doodlesList } from '../../data/offTheClock';
 
 // SVG Doodle Path Animation variants
 const drawVariant = {
@@ -98,15 +98,15 @@ export default function DoodleCorner() {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    historyRef.current.push(snapshot);
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    historyRef.current.push(imageData);
     if (historyRef.current.length > 20) {
       historyRef.current.shift();
     }
     redoRef.current = [];
   };
 
-  const getCoordinates = (e) => {
+  const getCanvasCoordinates = (e) => {
     const canvas = canvasRef.current;
     if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
@@ -120,23 +120,24 @@ export default function DoodleCorner() {
     saveState();
     setIsDrawing(true);
     setHasDrawn(true);
-
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    const { x, y } = getCoordinates(e);
-
-    ctx.strokeStyle = isEraser ? '#FAF8F3' : activeColor;
-    ctx.lineWidth = isEraser ? brushSize * 2.5 : brushSize;
+    const { x, y } = getCanvasCoordinates(e);
+    const ctx = canvasRef.current.getContext('2d');
     ctx.beginPath();
     ctx.moveTo(x, y);
+
+    if (isEraser) {
+      ctx.strokeStyle = '#FAF8F3';
+      ctx.lineWidth = brushSize * 3;
+    } else {
+      ctx.strokeStyle = activeColor;
+      ctx.lineWidth = brushSize;
+    }
   };
 
   const draw = (e) => {
     if (!isDrawing) return;
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    const { x, y } = getCoordinates(e);
-
+    const { x, y } = getCanvasCoordinates(e);
+    const ctx = canvasRef.current.getContext('2d');
     ctx.lineTo(x, y);
     ctx.stroke();
   };
@@ -144,42 +145,33 @@ export default function DoodleCorner() {
   const stopDrawing = () => {
     if (!isDrawing) return;
     setIsDrawing(false);
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvasRef.current.getContext('2d');
     ctx.closePath();
   };
 
   const handleUndo = () => {
+    if (historyRef.current.length === 0) return;
     const canvas = canvasRef.current;
-    if (!canvas || historyRef.current.length === 0) return;
     const ctx = canvas.getContext('2d');
-
-    const current = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    redoRef.current.push(current);
-
-    const prev = historyRef.current.pop();
-    if (prev) {
-      ctx.putImageData(prev, 0, 0);
-    }
+    const currentState = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    redoRef.current.push(currentState);
+    const previousState = historyRef.current.pop();
+    ctx.putImageData(previousState, 0, 0);
   };
 
   const handleRedo = () => {
+    if (redoRef.current.length === 0) return;
     const canvas = canvasRef.current;
-    if (!canvas || redoRef.current.length === 0) return;
     const ctx = canvas.getContext('2d');
-
-    const next = redoRef.current.pop();
-    if (next) {
-      const current = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      historyRef.current.push(current);
-      ctx.putImageData(next, 0, 0);
-    }
+    const currentState = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    historyRef.current.push(currentState);
+    const nextState = redoRef.current.pop();
+    ctx.putImageData(nextState, 0, 0);
   };
 
   const handleClear = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
     saveState();
+    const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     setHasDrawn(false);
@@ -271,21 +263,11 @@ export default function DoodleCorner() {
     ctx.restore();
   };
 
-  return (
-    <div className="otc-doodle-corner otc-notebook-ruled" aria-label="Doodle Corner">
-      {/* Section Head */}
-      <div className="otc-doodle-head">
-        <h3 className="otc-doodle-title">{doodleHeader.title}</h3>
-        <p className="otc-doodle-subtitle">{doodleHeader.subtitle}</p>
-      </div>
-
-      {/* 8 Curated Story Doodles (2 clean rows of 4 on desktop, 2 cols on mobile) */}
-      <div className="otc-doodles-grid">
-        {/* 1. Laptop with bug & sweat drop */}
-        <motion.div
-          className="otc-doodle-card"
-          whileHover={shouldReduceMotion ? {} : { rotate: -2, y: -4 }}
-        >
+  // Helper to render individual doodle SVGs with draw-on-scroll animation
+  const renderDoodleSvg = (id) => {
+    switch (id) {
+      case 'machine':
+        return (
           <svg className="otc-doodle-svg" viewBox="0 0 100 100" fill="none" aria-hidden="true">
             <motion.path
               d="M 22 25 H 78 V 62 H 22 Z"
@@ -333,17 +315,9 @@ export default function DoodleCorner() {
               custom={0.3}
             />
           </svg>
-          <span className="otc-doodle-label">
-            <span>it works on my machine</span>
-            <span aria-hidden="true">💻</span>
-          </span>
-        </motion.div>
-
-        {/* 2. Glass of tea with steam */}
-        <motion.div
-          className="otc-doodle-card"
-          whileHover={shouldReduceMotion ? {} : { rotate: 2, y: -4 }}
-        >
+        );
+      case 'tea':
+        return (
           <svg className="otc-doodle-svg" viewBox="0 0 100 100" fill="none" aria-hidden="true">
             <motion.path
               d="M 32 30 L 38 75 H 62 L 68 30 Z"
@@ -379,17 +353,9 @@ export default function DoodleCorner() {
               custom={0.3}
             />
           </svg>
-          <span className="otc-doodle-label">
-            <span>tea first, debug later</span>
-            <span aria-hidden="true">☕</span>
-          </span>
-        </motion.div>
-
-        {/* 3. Coconut palm trees (Kerala mode) */}
-        <motion.div
-          className="otc-doodle-card"
-          whileHover={shouldReduceMotion ? {} : { rotate: -2, y: -4 }}
-        >
+        );
+      case 'kerala':
+        return (
           <svg className="otc-doodle-svg" viewBox="0 0 100 100" fill="none" aria-hidden="true">
             <motion.path
               d="M 50 78 Q 44 50 56 28"
@@ -427,17 +393,9 @@ export default function DoodleCorner() {
               custom={0.32}
             />
           </svg>
-          <span className="otc-doodle-label">
-            <span>Kerala mode</span>
-            <span aria-hidden="true">🌴</span>
-          </span>
-        </motion.div>
-
-        {/* 4. Scooter (random evening ride) */}
-        <motion.div
-          className="otc-doodle-card"
-          whileHover={shouldReduceMotion ? {} : { rotate: 2, y: -4 }}
-        >
+        );
+      case 'scooter':
+        return (
           <svg className="otc-doodle-svg" viewBox="0 0 100 100" fill="none" aria-hidden="true">
             <motion.circle
               cx="28"
@@ -486,17 +444,9 @@ export default function DoodleCorner() {
               custom={0.38}
             />
           </svg>
-          <span className="otc-doodle-label">
-            <span>random evening ride</span>
-            <span aria-hidden="true">🛵</span>
-          </span>
-        </motion.div>
-
-        {/* 5. Git branch (send help) */}
-        <motion.div
-          className="otc-doodle-card"
-          whileHover={shouldReduceMotion ? {} : { rotate: -2, y: -4 }}
-        >
+        );
+      case 'git-branch':
+        return (
           <svg className="otc-doodle-svg" viewBox="0 0 100 100" fill="none" aria-hidden="true">
             <motion.path
               d="M 32 20 V 78"
@@ -542,17 +492,9 @@ export default function DoodleCorner() {
               custom={0.35}
             />
           </svg>
-          <span className="otc-doodle-label">
-            <span>send help</span>
-            <span aria-hidden="true">🌿</span>
-          </span>
-        </motion.div>
-
-        {/* 6. 404 scribble (page not found, me neither) */}
-        <motion.div
-          className="otc-doodle-card"
-          whileHover={shouldReduceMotion ? {} : { rotate: 2, y: -4 }}
-        >
+        );
+      case '404':
+        return (
           <svg className="otc-doodle-svg" viewBox="0 0 100 100" fill="none" aria-hidden="true">
             <motion.path
               d="M 28 32 L 18 54 H 34 V 68 M 30 44 V 68"
@@ -590,17 +532,9 @@ export default function DoodleCorner() {
               custom={0.38}
             />
           </svg>
-          <span className="otc-doodle-label">
-            <span>page not found, me neither</span>
-            <span aria-hidden="true">❓</span>
-          </span>
-        </motion.div>
-
-        {/* 7. NSS helping-hand heart (volunteer mode) */}
-        <motion.div
-          className="otc-doodle-card"
-          whileHover={shouldReduceMotion ? {} : { rotate: -2, y: -4 }}
-        >
+        );
+      case 'nss':
+        return (
           <svg className="otc-doodle-svg" viewBox="0 0 100 100" fill="none" aria-hidden="true">
             <motion.path
               d="M 50 74 C 50 74, 24 54, 24 38 C 24 26, 34 20, 42 26 C 47 29, 50 34, 50 34 C 50 34, 53 29, 58 26 C 66 20, 76 26, 76 38 C 76 54, 50 74, 50 74 Z"
@@ -625,17 +559,9 @@ export default function DoodleCorner() {
               custom={0.32}
             />
           </svg>
-          <span className="otc-doodle-label">
-            <span>volunteer mode</span>
-            <span aria-hidden="true">🤝</span>
-          </span>
-        </motion.div>
-
-        {/* 8. Rocket with wavy exhaust (ship it) */}
-        <motion.div
-          className="otc-doodle-card"
-          whileHover={shouldReduceMotion ? {} : { rotate: 2, y: -4 }}
-        >
+        );
+      case 'rocket':
+        return (
           <svg className="otc-doodle-svg" viewBox="0 0 100 100" fill="none" aria-hidden="true">
             <motion.path
               d="M 50 16 C 42 28, 40 48, 40 60 H 60 C 60 48, 58 28, 50 16 Z"
@@ -649,7 +575,7 @@ export default function DoodleCorner() {
               custom={0.22}
             />
             <motion.path
-              d="M 40 50 L 28 64 H 40 M 60 50 L 72 64 H 60"
+              d="M 40 48 L 28 62 H 40"
               stroke="var(--ink)"
               strokeWidth="2.2"
               strokeLinecap="round"
@@ -657,24 +583,35 @@ export default function DoodleCorner() {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              custom={0.32}
+              custom={0.3}
             />
-            <motion.circle
-              cx="50"
-              cy="38"
-              r="4.5"
-              fill="var(--accent)"
+            <motion.path
+              d="M 60 48 L 72 62 H 60"
               stroke="var(--ink)"
-              strokeWidth="1.8"
+              strokeWidth="2.2"
+              strokeLinecap="round"
               variants={drawVariant}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              custom={0.4}
+              custom={0.3}
+            />
+            <motion.circle
+              cx="50"
+              cy="36"
+              r="5"
+              fill="var(--accent)"
+              stroke="var(--accent-ink)"
+              strokeWidth="1.2"
+              variants={drawVariant}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              custom={0.38}
             />
             <motion.path
-              d="M 46 66 Q 44 76 50 82 Q 56 76 54 66"
-              stroke="var(--ink)"
+              d="M 45 66 Q 50 76 44 86 M 50 66 Q 54 74 50 84 M 55 66 Q 60 76 56 86"
+              stroke="var(--accent)"
               strokeWidth="2.2"
               strokeLinecap="round"
               variants={drawVariant}
@@ -684,11 +621,50 @@ export default function DoodleCorner() {
               custom={0.48}
             />
           </svg>
-          <span className="otc-doodle-label">
-            <span>ship it</span>
-            <span aria-hidden="true">🚀</span>
-          </span>
-        </motion.div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="otc-doodle-corner otc-notebook-ruled" aria-label="Doodle Corner">
+      {/* Section Head */}
+      <div className="otc-doodle-head">
+        <h3 className="otc-doodle-title">{doodleHeader.title}</h3>
+        <p className="otc-doodle-subtitle">{doodleHeader.subtitle}</p>
+      </div>
+
+      {/* Curated Story Doodles (8 on desktop, 6 on mobile <= 640px via hideOnMobile flag) */}
+      <div className="otc-doodles-grid">
+        {doodlesList.map((doodle, index) => {
+          const isTiltedOdd = index % 2 !== 0;
+
+          return (
+            <motion.div
+              key={doodle.id}
+              className={`otc-doodle-card ${doodle.hideOnMobile ? 'otc-doodle-hide-mobile' : ''}`}
+              whileHover={shouldReduceMotion ? {} : { rotate: isTiltedOdd ? 2 : -2, y: -4 }}
+              whileTap={
+                shouldReduceMotion
+                  ? {}
+                  : {
+                      scale: 0.94,
+                      rotate: [-2, 2, -1, 0],
+                      transition: { duration: 0.25 }
+                    }
+              }
+            >
+              {renderDoodleSvg(doodle.id)}
+              <span className="otc-doodle-label">
+                <span className="otc-doodle-text">{doodle.label}</span>
+                <span className="otc-doodle-emoji" aria-hidden="true">
+                  {doodle.emoji}
+                </span>
+              </span>
+            </motion.div>
+          );
+        })}
       </div>
 
       {/* Sticky note tape reminders */}
@@ -703,7 +679,7 @@ export default function DoodleCorner() {
         </div>
       </div>
 
-      {/* Interactive Sketchpad */}
+      {/* Interactive Sketchpad (stays below, full width, min height 260px, touch-action: none ONLY on canvas) */}
       <div className="otc-sketchpad-section">
         <div className="otc-sketchpad-header">
           <h4 className="otc-sketchpad-title">

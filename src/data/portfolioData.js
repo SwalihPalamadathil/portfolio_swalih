@@ -20,7 +20,8 @@ export const personalInfo = {
   location: "Kerala, India",
   email: "swalihpalamadathil@gmail.com",
   editionYear: "2026",
-  github: "https://github.com/SwalihPalamadathil",
+  instagram: "https://www.instagram.com/swxliih/",
+  instagramHandle: "@swxliih",
   linkedin: "https://www.linkedin.com/in/muhammed-swalih-a4588b326/",
   availabilityLine: "Open to internship and junior frontend roles."
 };

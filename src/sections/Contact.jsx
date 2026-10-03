@@ -82,15 +82,37 @@ function LinkAccent() {
   );
 }
 
-function DoodleLink({ href, children }) {
+function InstagramIcon({ size = 13 }) {
+  return (
+    <svg
+      className="contact-link-accent"
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="var(--ink-muted)"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+    </svg>
+  );
+}
+
+function DoodleLink({ href, ariaLabel, icon, children }) {
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
+      aria-label={ariaLabel}
       className="contact-text-link"
     >
-      <LinkAccent />
+      {icon || <LinkAccent />}
       <span className="contact-text-link-label">{children}</span>
       <svg
         className="contact-link-underline"
@@ -317,8 +339,19 @@ export default function Contact() {
         <p className="contact-availability-note">{personalInfo.availabilityLine}</p>
 
         <nav className="contact-plain-links" aria-label="Profiles">
-          <DoodleLink href={personalInfo.github}>GitHub</DoodleLink>
-          <DoodleLink href={personalInfo.linkedin}>LinkedIn</DoodleLink>
+          <DoodleLink
+            href={personalInfo.instagram}
+            ariaLabel="Instagram profile (opens in new tab)"
+            icon={<InstagramIcon />}
+          >
+            Instagram
+          </DoodleLink>
+          <DoodleLink
+            href={personalInfo.linkedin}
+            ariaLabel="LinkedIn profile (opens in new tab)"
+          >
+            LinkedIn
+          </DoodleLink>
         </nav>
 
         <div className="contact-live" aria-live="polite" aria-atomic="true">

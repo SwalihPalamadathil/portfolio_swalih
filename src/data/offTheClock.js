@@ -181,6 +181,10 @@ export const photos = [
   }
 ];
 
+export const photoCollectionConfig = {
+  coverIndex: 0
+};
+
 /**
  * Doodle section metadata
  */
@@ -188,3 +192,58 @@ export const doodleHeader = {
   title: "Things I draw when code doesn't work.",
   subtitle: 'Rough margin sketches and notebook notes when debugging gets stubborn.'
 };
+
+/**
+ * 8 Curated Story Doodles
+ * - hideOnMobile: true hides the doodle on viewport widths <= 640px (reducing to 6 doodles on mobile)
+ */
+export const doodlesList = [
+  {
+    id: 'machine',
+    label: 'it works on my machine',
+    emoji: '💻',
+    hideOnMobile: false
+  },
+  {
+    id: 'tea',
+    label: 'tea first, debug later',
+    emoji: '☕',
+    hideOnMobile: false
+  },
+  {
+    id: 'kerala',
+    label: 'Kerala mode',
+    emoji: '🌴',
+    hideOnMobile: false
+  },
+  {
+    id: 'scooter',
+    label: 'random evening ride',
+    emoji: '🛵',
+    hideOnMobile: false
+  },
+  {
+    id: 'git-branch',
+    label: 'send help',
+    emoji: '🌿',
+    hideOnMobile: true
+  },
+  {
+    id: '404',
+    label: 'page not found, me neither',
+    emoji: '❓',
+    hideOnMobile: true
+  },
+  {
+    id: 'nss',
+    label: 'volunteer mode',
+    emoji: '🤝',
+    hideOnMobile: false
+  },
+  {
+    id: 'rocket',
+    label: 'ship it',
+    emoji: '🚀',
+    hideOnMobile: false
+  }
+];

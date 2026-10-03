@@ -1,5 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { X, ArrowUp } from 'lucide-react';
+
+const MOBILE_BREAKPOINT = 768;
 
 const STARTER_QUESTIONS = [
   "what's CamMap?",
@@ -13,7 +16,7 @@ const ROTATING_PROMPTS = [
   "or just say hi!"
 ];
 
-// Hand-drawn speech-scribble doodle mark
+// Hand-drawn speech-scribble doodle mark for the resting trigger card
 function SpeechScribbleDoodle({ shouldReduceMotion }) {
   return (
     <svg
@@ -24,7 +27,6 @@ function SpeechScribbleDoodle({ shouldReduceMotion }) {
       fill="none"
       aria-hidden="true"
     >
-      {/* Hand-drawn irregular speech bubble contour */}
       <path
         d="M 3.2 5.5 C 3 3.8, 4.4 2.4, 7.2 2.2 C 13.5 1.8, 19.2 2.1, 22.4 2.8 C 24.2 3.3, 24.8 4.8, 24.6 7.4 C 24.3 10.8, 24.4 13.5, 23 15.6 C 21.8 17.2, 19.6 17.5, 15.5 17.5 L 12.8 21.5 C 12.1 22.5, 10.8 22, 11.2 20.5 L 11.8 17.5 C 7 17.4, 4.6 16.9, 3.5 15.2 C 2.3 13.2, 2.6 9.5, 3.2 5.5 Z"
         className="hero-chat-bubble-outline"
@@ -33,7 +35,6 @@ function SpeechScribbleDoodle({ shouldReduceMotion }) {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      {/* Living scribble thought stroke */}
       <motion.path
         d="M 6.8 9.5 C 9 7.2, 11.2 11.8, 13.8 9.2 C 15.8 7.2, 17.8 11.2, 19.5 9"
         className="hero-chat-scribble-stroke"
@@ -45,18 +46,17 @@ function SpeechScribbleDoodle({ shouldReduceMotion }) {
           shouldReduceMotion
             ? { pathLength: 1, opacity: 1 }
             : {
-              pathLength: [0, 1, 1, 0],
-              opacity: [0.35, 1, 1, 0.35],
-              transition: {
-                duration: 4.4,
-                repeat: Infinity,
-                ease: 'easeInOut',
-                times: [0, 0.45, 0.85, 1]
+                pathLength: [0, 1, 1, 0],
+                opacity: [0.35, 1, 1, 0.35],
+                transition: {
+                  duration: 4.4,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                  times: [0, 0.45, 0.85, 1]
+                }
               }
-            }
         }
       />
-      {/* Secondary micro-tick */}
       <motion.path
         d="M 8 13.5 C 10.5 12.4, 13 14, 16 13"
         className="hero-chat-scribble-stroke-sub"
@@ -68,73 +68,18 @@ function SpeechScribbleDoodle({ shouldReduceMotion }) {
           shouldReduceMotion
             ? { pathLength: 1, opacity: 0.85 }
             : {
-              pathLength: [0, 1, 1, 0],
-              opacity: [0.2, 0.85, 0.85, 0.2],
-              transition: {
-                duration: 4.4,
-                repeat: Infinity,
-                ease: 'easeInOut',
-                times: [0.15, 0.55, 0.85, 1]
+                pathLength: [0, 1, 1, 0],
+                opacity: [0.2, 0.85, 0.85, 0.2],
+                transition: {
+                  duration: 4.4,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                  times: [0.15, 0.55, 0.85, 1]
+                }
               }
-            }
         }
       />
     </svg>
-  );
-}
-
-function CloseDoodle() {
-  return (
-    <svg
-      viewBox="0 0 16 16"
-      width="13"
-      height="13"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.65"
-      strokeLinecap="round"
-      aria-hidden="true"
-    >
-      <path d="M 3.5 3.5 L 12.5 12.5" />
-      <path d="M 12.5 3.5 L 3.5 12.5" />
-    </svg>
-  );
-}
-
-function SendDoodle() {
-  return (
-    <svg
-      viewBox="0 0 20 20"
-      width="15"
-      height="15"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M 3 10 L 17 3 L 11 17 L 9 11 Z" />
-      <path d="M 9 11 L 17 3" />
-    </svg>
-  );
-}
-
-function SeparatorTick() {
-  return (
-    <div className="hero-chat-tick-wrap" aria-hidden="true">
-      <svg
-        viewBox="0 0 44 6"
-        width="34"
-        height="5"
-        fill="none"
-        stroke="var(--ink-faint)"
-        strokeWidth="1.25"
-        strokeLinecap="round"
-      >
-        <path d="M 2 3 C 14 1.5, 28 4.5, 42 2.5" />
-      </svg>
-    </div>
   );
 }
 
@@ -147,18 +92,18 @@ function ThinkingDots({ shouldReduceMotion }) {
     <span className="hero-chat-thinking-wrap" aria-label="Thinking">
       <motion.span
         className="hero-chat-dot"
-        animate={{ opacity: [0.3, 1, 0.3], y: [0, -2, 0] }}
-        transition={{ duration: 0.9, repeat: Infinity, ease: 'easeInOut', delay: 0 }}
+        animate={{ opacity: [0.3, 1, 0.3], y: [0, -3, 0] }}
+        transition={{ duration: 0.8, repeat: Infinity, ease: 'easeInOut', delay: 0 }}
       />
       <motion.span
         className="hero-chat-dot"
-        animate={{ opacity: [0.3, 1, 0.3], y: [0, -2, 0] }}
-        transition={{ duration: 0.9, repeat: Infinity, ease: 'easeInOut', delay: 0.2 }}
+        animate={{ opacity: [0.3, 1, 0.3], y: [0, -3, 0] }}
+        transition={{ duration: 0.8, repeat: Infinity, ease: 'easeInOut', delay: 0.18 }}
       />
       <motion.span
         className="hero-chat-dot"
-        animate={{ opacity: [0.3, 1, 0.3], y: [0, -2, 0] }}
-        transition={{ duration: 0.9, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
+        animate={{ opacity: [0.3, 1, 0.3], y: [0, -3, 0] }}
+        transition={{ duration: 0.8, repeat: Infinity, ease: 'easeInOut', delay: 0.36 }}
       />
     </span>
   );
@@ -166,6 +111,24 @@ function ThinkingDots({ shouldReduceMotion }) {
 
 export default function HeroChat() {
   const shouldReduceMotion = useReducedMotion();
+
+  // Responsive breakpoint tracking without layout shifts
+  const isMobile = React.useSyncExternalStore(
+    (callback) => {
+      if (typeof window === 'undefined') return () => {};
+      const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`);
+      if (mql.addEventListener) {
+        mql.addEventListener('change', callback);
+        return () => mql.removeEventListener('change', callback);
+      } else {
+        mql.addListener(callback);
+        return () => mql.removeListener(callback);
+      }
+    },
+    () => (typeof window !== 'undefined' ? window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches : false),
+    () => false
+  );
+
   const [isExpanded, setIsExpanded] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -175,13 +138,18 @@ export default function HeroChat() {
   const [promptIndex, setPromptIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
+  const [showScrollBottomBtn, setShowScrollBottomBtn] = useState(false);
 
-  const messagesEndRef = useRef(null);
-  const inputRef = useRef(null);
-  const containerRef = useRef(null);
+  const messagesContainerRef = useRef(null);
+  const textareaRef = useRef(null);
+  const triggerRef = useRef(null);
+  const panelRef = useRef(null);
+  const scrollYRef = useRef(0);
   const idCounterRef = useRef(0);
+  const lastQueryRef = useRef('');
+  const isNearBottomRef = useRef(true);
 
-  // Rotate micro-copy every 4.5s when idle, unhovered, and before first interaction
+  // Rotate micro-copy every 4.5s when idle and before first interaction
   useEffect(() => {
     if (shouldReduceMotion || isExpanded || hasInteracted || isHovered) return;
     const interval = setInterval(() => {
@@ -190,37 +158,144 @@ export default function HeroChat() {
     return () => clearInterval(interval);
   }, [shouldReduceMotion, isExpanded, hasInteracted, isHovered]);
 
-  // Auto-scroll inside message list when new messages arrive
+  // Mobile visualViewport listener for keyboard height
   useEffect(() => {
-    if (isExpanded && messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: shouldReduceMotion ? 'auto' : 'smooth' });
-    }
-  }, [messages, isLoading, isExpanded, shouldReduceMotion]);
+    if (!isExpanded || !isMobile || typeof window === 'undefined' || !window.visualViewport) return;
 
-  // Focus input on expand
-  useEffect(() => {
-    if (isExpanded && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [isExpanded]);
-
-  // Handle keyboard shortcuts (Escape collapses)
-  useEffect(() => {
-    function handleKeyDown(e) {
-      if (e.key === 'Escape' && isExpanded) {
-        setIsExpanded(false);
+    const updateViewportHeight = () => {
+      if (window.visualViewport) {
+        document.documentElement.style.setProperty(
+          '--vvh',
+          `${window.visualViewport.height}px`
+        );
       }
+    };
+
+    updateViewportHeight();
+    const vv = window.visualViewport;
+    vv.addEventListener('resize', updateViewportHeight);
+    vv.addEventListener('scroll', updateViewportHeight);
+
+    return () => {
+      vv.removeEventListener('resize', updateViewportHeight);
+      vv.removeEventListener('scroll', updateViewportHeight);
+      document.documentElement.style.removeProperty('--vvh');
+    };
+  }, [isExpanded, isMobile]);
+
+  // Lock body scroll ONLY on mobile while sheet is open, restoring exact previous scroll position
+  useEffect(() => {
+    if (isExpanded && isMobile) {
+      scrollYRef.current = window.scrollY || window.pageYOffset || 0;
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+
+      return () => {
+        document.body.style.overflow = originalOverflow;
+        window.scrollTo(0, scrollYRef.current);
+      };
     }
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isExpanded, isMobile]);
+
+  // Focus input with preventScroll: true when panel opens
+  useEffect(() => {
+    if (isExpanded) {
+      const timer = setTimeout(() => {
+        textareaRef.current?.focus({ preventScroll: true });
+      }, 60);
+      return () => clearTimeout(timer);
+    }
   }, [isExpanded]);
 
+  // Scoped smooth scroll ONLY inside messages container
+  const scrollToBottom = useCallback((smooth = true) => {
+    const el = messagesContainerRef.current;
+    if (!el) return;
+    el.scrollTo({
+      top: el.scrollHeight,
+      behavior: shouldReduceMotion || !smooth ? 'auto' : 'smooth'
+    });
+    setShowScrollBottomBtn(false);
+    isNearBottomRef.current = true;
+  }, [shouldReduceMotion]);
+
+  // Monitor scroll in messages container to detect if user scrolled up
+  const handleMessagesScroll = useCallback(() => {
+    const el = messagesContainerRef.current;
+    if (!el) return;
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+    const nearBottom = distanceFromBottom <= 80;
+    isNearBottomRef.current = nearBottom;
+    if (nearBottom && showScrollBottomBtn) {
+      setShowScrollBottomBtn(false);
+    }
+  }, [showScrollBottomBtn]);
+
+  // Auto-scroll on new messages or loading only if already near bottom
+  useEffect(() => {
+    if (!isExpanded) return;
+    if (isNearBottomRef.current) {
+      requestAnimationFrame(() => {
+        scrollToBottom(!shouldReduceMotion);
+      });
+    } else {
+      setShowScrollBottomBtn(true);
+    }
+  }, [messages, isLoading, isExpanded, shouldReduceMotion, scrollToBottom]);
+
+  const openChat = () => {
+    scrollYRef.current = window.scrollY || window.pageYOffset || 0;
+    setHasInteracted(true);
+    setIsExpanded(true);
+  };
+
+  const closeChat = () => {
+    setIsExpanded(false);
+    triggerRef.current?.focus({ preventScroll: true });
+  };
+
+  // Keyboard navigation & Esc / Focus trap
+  useEffect(() => {
+    if (!isExpanded) return;
+
+    const handleKeyDownGlobal = (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeChat();
+      } else if (e.key === 'Tab' && isMobile && panelRef.current) {
+        // Focus trap on mobile sheet
+        const focusable = panelRef.current.querySelectorAll(
+          'button:not([disabled]), [href], textarea:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDownGlobal);
+    return () => window.removeEventListener('keydown', handleKeyDownGlobal);
+  }, [isExpanded, isMobile]);
+
+  // API Message Send Logic (AI logic, prompt payload and keys preserved strictly)
   const handleSendMessage = async (textToSend) => {
     const query = (textToSend || input).trim();
     if (!query || isLoading || isRateLimited) return;
 
+    lastQueryRef.current = query;
     setErrorNotice(null);
     setInput('');
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
 
     idCounterRef.current += 1;
     const userMessage = { role: 'user', text: query, id: `user-${idCounterRef.current}` };
@@ -230,7 +305,7 @@ export default function HeroChat() {
 
     try {
       // Build short history payload (exclude IDs)
-      const historyPayload = messages.slice(-5).map(m => ({
+      const historyPayload = messages.slice(-5).map((m) => ({
         role: m.role,
         text: m.text
       }));
@@ -250,12 +325,12 @@ export default function HeroChat() {
         setIsRateLimited(true);
         setErrorNotice(
           data.message ||
-          "You've reached the conversation limit for this session. Feel free to connect directly with Muhammed via email at swalihpalamadathil@gmail.com!"
+            "You've reached the conversation limit for this session. Feel free to connect directly with Muhammed via email at swalihpalamadathil@gmail.com!"
         );
       } else if (!res.ok) {
         setErrorNotice(
           data.message ||
-          "I'm having trouble connecting right now. Please feel free to email Muhammed directly at swalihpalamadathil@gmail.com."
+            "I'm having trouble connecting right now. Please feel free to email Muhammed directly at swalihpalamadathil@gmail.com."
         );
       } else if (data.reply) {
         idCounterRef.current += 1;
@@ -273,7 +348,16 @@ export default function HeroChat() {
       );
     } finally {
       setIsLoading(false);
+      textareaRef.current?.focus({ preventScroll: true });
     }
+  };
+
+  const handleTextareaChange = (e) => {
+    setInput(e.target.value);
+    const target = e.target;
+    target.style.height = 'auto';
+    const newHeight = Math.min(target.scrollHeight, 120);
+    target.style.height = `${newHeight}px`;
   };
 
   const handleKeyDownInput = (e) => {
@@ -284,178 +368,233 @@ export default function HeroChat() {
   };
 
   return (
-    <div
-      ref={containerRef}
-      className={`hero-chat-wrapper ${isExpanded ? 'is-expanded' : 'is-resting'}`}
-    >
-      <AnimatePresence mode="wait">
-        {!isExpanded ? (
-          /* RESTING STATE: Catchy, Hand-drawn Sticky Note Prompt */
-          <motion.button
-            key="resting-note"
-            type="button"
-            className="hero-chat-resting-note"
-            onClick={() => {
-              setHasInteracted(true);
-              setIsExpanded(true);
-            }}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            onFocus={() => setIsHovered(true)}
-            onBlur={() => setIsHovered(false)}
-            aria-label="Ask me anything about my work — click to open chat"
-            aria-expanded="false"
-            initial={{
-              opacity: 0,
-              y: shouldReduceMotion ? 0 : 16,
-              rotate: shouldReduceMotion ? 0 : -2.8
-            }}
-            animate={
-              shouldReduceMotion
-                ? { opacity: 1, y: 0, rotate: 0 }
-                : {
-                  opacity: 1,
-                  y: [16, -2, 0, 0, -1.5, 0],
-                  rotate: [-2.8, -0.6, -1.2, -1.2, -0.7, -1.2],
-                  transition: {
-                    duration: 2.2,
-                    delay: 0.35,
-                    times: [0, 0.22, 0.32, 0.78, 0.88, 1],
-                    ease: 'easeInOut'
-                  }
-                }
-            }
-            exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.15 } }}
-            whileHover={
-              shouldReduceMotion
-                ? {}
-                : {
-                  rotate: 0,
-                  y: -2.5,
-                  transition: { duration: 0.2, ease: 'easeOut' }
-                }
-            }
-            whileTap={shouldReduceMotion ? {} : { scale: 0.985, y: -0.5 }}
+    <>
+      {/* =========================================================================
+          HERO INLINE TRIGGER CARD (Never changes size or pushes page content)
+          ========================================================================= */}
+      <div className="hero-chat-container">
+        <button
+          ref={triggerRef}
+          type="button"
+          className={`hero-chat-resting-note ${isExpanded ? 'is-active-trigger' : ''}`}
+          onClick={openChat}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          onFocus={() => setIsHovered(true)}
+          onBlur={() => setIsHovered(false)}
+          aria-label="Ask me anything about my work — click to open chat"
+          aria-expanded={isExpanded}
+          aria-haspopup="dialog"
+          aria-controls="hero-ai-chat-panel"
+        >
+          {/* Hand-drawn Irregular Border SVG Frame */}
+          <svg
+            className="hero-chat-frame-svg"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            aria-hidden="true"
           >
-            {/* Hand-drawn Irregular Border SVG Frame */}
-            <svg
-              className="hero-chat-frame-svg"
-              viewBox="0 0 100 100"
-              preserveAspectRatio="none"
-              aria-hidden="true"
-            >
-              <path
-                d="M 2 3 C 26 1.4, 74 2.2, 98 2.8 C 98.8 25, 98.2 75, 98.4 97 C 74 98.2, 26 97.4, 1.8 97.2 C 2.4 75, 1.4 25, 2 3 Z"
-                vectorEffect="non-scaling-stroke"
-                className="hero-chat-frame-path"
-              />
-            </svg>
+            <path
+              d="M 2 3 C 26 1.4, 74 2.2, 98 2.8 C 98.8 25, 98.2 75, 98.4 97 C 74 98.2, 26 97.4, 1.8 97.2 C 2.4 75, 1.4 25, 2 3 Z"
+              vectorEffect="non-scaling-stroke"
+              className="hero-chat-frame-path"
+            />
+          </svg>
 
-            <span className="hero-chat-resting-content">
-              <span className="hero-chat-resting-icon" aria-hidden="true">
-                <SpeechScribbleDoodle shouldReduceMotion={shouldReduceMotion} />
+          <span className="hero-chat-resting-content">
+            <span className="hero-chat-resting-icon" aria-hidden="true">
+              <SpeechScribbleDoodle shouldReduceMotion={shouldReduceMotion} />
+            </span>
+            <span className="hero-chat-resting-copy">
+              <span className="hero-chat-invite-row">
+                <span className="hero-chat-invite-title">Ask me anything</span>
+                <span className="hero-chat-prompt-chevron" aria-hidden="true">›</span>
               </span>
-              <span className="hero-chat-resting-copy">
-                <span className="hero-chat-invite-row">
-                  <span className="hero-chat-invite-title">Ask me anything</span>
-                  <span className="hero-chat-prompt-chevron" aria-hidden="true">›</span>
-                </span>
-                <span className="hero-chat-detail-viewport">
-                  <AnimatePresence mode="wait">
-                    <motion.span
-                      key={promptIndex}
-                      className="hero-chat-detail-text"
-                      initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 3 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: shouldReduceMotion ? 0 : -3 }}
-                      transition={{ duration: shouldReduceMotion ? 0.05 : 0.28, ease: 'easeOut' }}
-                    >
-                      {ROTATING_PROMPTS[promptIndex]}
-                    </motion.span>
-                  </AnimatePresence>
-                </span>
+              <span className="hero-chat-detail-viewport">
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={promptIndex}
+                    className="hero-chat-detail-text"
+                    initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 3 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: shouldReduceMotion ? 0 : -3 }}
+                    transition={{ duration: shouldReduceMotion ? 0.05 : 0.28, ease: 'easeOut' }}
+                  >
+                    {ROTATING_PROMPTS[promptIndex]}
+                  </motion.span>
+                </AnimatePresence>
               </span>
             </span>
-          </motion.button>
-        ) : (
-          /* ACTIVE / EXPANDED STATE: Interactive Sticky Note Panel */
-          <motion.div
-            key="expanded-panel"
-            className="hero-chat-expanded-panel"
-            initial={{
-              opacity: 0,
-              height: 'auto',
-              scale: shouldReduceMotion ? 1 : 0.97
-            }}
-            animate={{
-              opacity: 1,
-              scale: 1,
-              transition: {
-                duration: shouldReduceMotion ? 0.05 : 0.3,
-                ease: [0.22, 1, 0.36, 1]
-              }
-            }}
-            exit={{
-              opacity: 0,
-              scale: shouldReduceMotion ? 1 : 0.96,
-              transition: { duration: 0.18 }
-            }}
-          >
-            {/* Hand-drawn Irregular Border SVG Frame */}
-            <svg
-              className="hero-chat-frame-svg"
-              viewBox="0 0 100 100"
-              preserveAspectRatio="none"
-              aria-hidden="true"
-            >
-              <path
-                d="M 1.5 2 C 28 1.2, 72 1.8, 98.5 2 C 99.2 26, 98.2 74, 98.5 98 C 72 98.8, 28 98.2, 1.5 98 C 1.2 74, 1.8 26, 1.5 2 Z"
-                vectorEffect="non-scaling-stroke"
-                fill="var(--bg-raised)"
-                stroke="var(--ink-muted)"
-                strokeWidth="1.45"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+          </span>
+        </button>
+      </div>
+
+      {/* =========================================================================
+          FIXED-POSITION CHAT PANEL (Desktop: Floating Bottom-Right, Mobile: Bottom Sheet)
+          ========================================================================= */}
+      <AnimatePresence>
+        {isExpanded && (
+          <div className="hero-chat-portal-wrapper">
+            {/* Mobile backdrop (tapping closes sheet; desktop stays interactive without backdrop) */}
+            {isMobile && (
+              <motion.div
+                className="hero-chat-backdrop"
+                onClick={closeChat}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: shouldReduceMotion ? 0.05 : 0.2 }}
+                aria-hidden="true"
               />
-            </svg>
+            )}
 
-            {/* Header: Note title & collapse button */}
-            <div className="hero-chat-panel-header">
-              <div className="hero-chat-panel-title">
-                <span className="hero-chat-note-pin" aria-hidden="true" />
-                <span className="hero-chat-title-text">portfolio assistant</span>
-              </div>
-              <button
-                type="button"
-                className="hero-chat-close-btn"
-                onClick={() => setIsExpanded(false)}
-                aria-label="Collapse chat note"
-              >
-                <CloseDoodle />
-              </button>
-            </div>
-
-            {/* Conversation Stream / Messages */}
-            <div
-              className="hero-chat-messages-area"
-              aria-live="polite"
-              aria-atomic="false"
+            <motion.div
+              ref={panelRef}
+              id="hero-ai-chat-panel"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Ask Swalih anything"
+              className={`hero-chat-fixed-panel ${isMobile ? 'is-mobile-sheet' : 'is-desktop-floating'}`}
+              initial={
+                isMobile
+                  ? { y: '100%', opacity: shouldReduceMotion ? 1 : 0.6 }
+                  : { opacity: 0, scale: shouldReduceMotion ? 1 : 0.94, y: 16 }
+              }
+              animate={
+                isMobile
+                  ? { y: 0, opacity: 1 }
+                  : { opacity: 1, scale: 1, y: 0 }
+              }
+              exit={
+                isMobile
+                  ? { y: '100%', opacity: shouldReduceMotion ? 1 : 0 }
+                  : { opacity: 0, scale: shouldReduceMotion ? 1 : 0.94, y: 12 }
+              }
+              transition={{
+                duration: shouldReduceMotion ? 0.05 : isMobile ? 0.3 : 0.24,
+                ease: [0.22, 1, 0.36, 1]
+              }}
             >
-              {messages.length === 0 && (
-                <div className="hero-chat-starter-view">
-                  <p className="hero-chat-starter-hint">
-                    Ask a question about Muhammed's skills, CamMap, or experience:
+              {/* Header Bar */}
+              <div className="hero-chat-panel-header">
+                <div className="hero-chat-header-text">
+                  <div className="hero-chat-header-title-row">
+                    <span className="hero-chat-header-dot" aria-hidden="true" />
+                    <h3 className="hero-chat-panel-title">Ask Swalih anything</h3>
+                  </div>
+                  <p className="hero-chat-panel-subtitle">
+                    Grounded in my portfolio data &amp; projects
                   </p>
-                  <div className="hero-chat-starter-tags">
+                </div>
+
+                <button
+                  type="button"
+                  className="hero-chat-panel-close-btn"
+                  onClick={closeChat}
+                  aria-label="Close chat (Escape)"
+                >
+                  <X size={18} aria-hidden="true" />
+                </button>
+              </div>
+
+              {/* Messages Scroll Container (Scrolled ONLY within this container) */}
+              <div
+                ref={messagesContainerRef}
+                className="hero-chat-messages-container"
+                onScroll={handleMessagesScroll}
+                aria-live="polite"
+                aria-atomic="false"
+              >
+                {/* Empty State Welcome Intro */}
+                {messages.length === 0 && (
+                  <div className="hero-chat-empty-intro">
+                    <div className="hero-chat-empty-icon" aria-hidden="true">
+                      <SpeechScribbleDoodle shouldReduceMotion={shouldReduceMotion} />
+                    </div>
+                    <h4 className="hero-chat-empty-title">Hi! What would you like to know?</h4>
+                    <p className="hero-chat-empty-text">
+                      I can tell you about CamMap, Muhammed&apos;s frontend skills, internship experience, or academic background.
+                    </p>
+                  </div>
+                )}
+
+                {/* Messages Stream */}
+                {messages.map((m) => (
+                  <motion.div
+                    key={m.id}
+                    className={`hero-chat-bubble-row is-${m.role}`}
+                    initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: shouldReduceMotion ? 0.05 : 0.2 }}
+                  >
+                    <div className="hero-chat-bubble-label">
+                      {m.role === 'user' ? 'You' : 'Swalih (Assistant)'}
+                    </div>
+                    <div className="hero-chat-bubble-content">
+                      {m.text}
+                    </div>
+                  </motion.div>
+                ))}
+
+                {/* Assistant Thinking Indicator */}
+                {isLoading && (
+                  <div className="hero-chat-bubble-row is-assistant is-thinking-row">
+                    <div className="hero-chat-bubble-label">Swalih (Assistant)</div>
+                    <div className="hero-chat-bubble-content is-thinking-bubble">
+                      <ThinkingDots shouldReduceMotion={shouldReduceMotion} />
+                    </div>
+                  </div>
+                )}
+
+                {/* Error Notice with Retry Button */}
+                {errorNotice && (
+                  <div className="hero-chat-error-card" role="alert">
+                    <p className="hero-chat-error-text">{errorNotice}</p>
+                    {lastQueryRef.current && (
+                      <button
+                        type="button"
+                        className="hero-chat-retry-btn"
+                        onClick={() => handleSendMessage(lastQueryRef.current)}
+                        disabled={isLoading}
+                      >
+                        Try again
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Floating "New message ↓" Chip if User Scrolled Up */}
+              <AnimatePresence>
+                {showScrollBottomBtn && (
+                  <motion.button
+                    type="button"
+                    className="hero-chat-scroll-bottom-btn"
+                    onClick={() => scrollToBottom(true)}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 8 }}
+                    transition={{ duration: 0.16 }}
+                    aria-label="Scroll to newest message"
+                  >
+                    <span>New message ↓</span>
+                  </motion.button>
+                )}
+              </AnimatePresence>
+
+              {/* Starter Question Suggestions (Horizontal row, hidden after first message) */}
+              {messages.length === 0 && (
+                <div className="hero-chat-suggestions-bar" aria-label="Suggested starter questions">
+                  <div className="hero-chat-suggestions-scroll">
                     {STARTER_QUESTIONS.map((q) => (
                       <button
                         key={q}
                         type="button"
-                        className="hero-chat-tag-btn"
+                        className="hero-chat-suggestion-chip"
                         onClick={() => handleSendMessage(q)}
                         disabled={isLoading}
                       >
-                        <span className="hero-chat-tag-tick">›</span>
+                        <span className="hero-chat-chip-tick">›</span>
                         <span>{q}</span>
                       </button>
                     ))}
@@ -463,92 +602,39 @@ export default function HeroChat() {
                 </div>
               )}
 
-              {messages.map((m, idx) => (
-                <React.Fragment key={m.id}>
-                  {idx > 0 && <SeparatorTick />}
-                  <motion.div
-                    className={`hero-chat-msg hero-chat-msg-${m.role}`}
-                    initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: shouldReduceMotion ? 0.05 : 0.22 }}
-                  >
-                    <div className="hero-chat-msg-role-label">
-                      {m.role === 'user' ? 'you' : 'swalih (assistant)'}
-                    </div>
-                    <div className="hero-chat-msg-text">{m.text}</div>
-                  </motion.div>
-                </React.Fragment>
-              ))}
-
-              {isLoading && (
-                <>
-                  {messages.length > 0 && <SeparatorTick />}
-                  <div className="hero-chat-msg hero-chat-msg-assistant is-thinking">
-                    <div className="hero-chat-msg-role-label">swalih (assistant)</div>
-                    <div className="hero-chat-msg-text">
-                      <ThinkingDots shouldReduceMotion={shouldReduceMotion} />
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {errorNotice && (
-                <div className="hero-chat-error-notice" role="alert">
-                  <p>{errorNotice}</p>
-                </div>
-              )}
-
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Input Row with Hand-drawn Underline */}
-            {!isRateLimited && (
-              <div className="hero-chat-input-row">
-                <div className="hero-chat-input-box">
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    className="hero-chat-input-field"
-                    placeholder="ask a question… (Enter to send)"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={handleKeyDownInput}
-                    maxLength={500}
-                    disabled={isLoading}
-                    aria-label="Your question about Muhammed"
-                  />
-                  {/* Organic hand-drawn underline */}
-                  <svg
-                    className="hero-chat-underline-svg"
-                    viewBox="0 0 200 6"
-                    preserveAspectRatio="none"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M 2 3 Q 50 1, 100 4 T 198 3"
-                      vectorEffect="non-scaling-stroke"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
+              {/* Input Area (Pinned at bottom of panel, never shifts page) */}
+              {!isRateLimited && (
+                <div className="hero-chat-input-stage">
+                  <div className="hero-chat-input-wrapper">
+                    <textarea
+                      ref={textareaRef}
+                      className="hero-chat-textarea"
+                      placeholder="Ask a question… (Enter to send, Shift+Enter for new line)"
+                      value={input}
+                      onChange={handleTextareaChange}
+                      onKeyDown={handleKeyDownInput}
+                      maxLength={500}
+                      rows={1}
+                      disabled={isLoading}
+                      aria-label="Ask a question about Muhammed"
                     />
-                  </svg>
-                </div>
 
-                <button
-                  type="button"
-                  className="hero-chat-send-btn"
-                  onClick={() => handleSendMessage()}
-                  disabled={isLoading || !input.trim()}
-                  aria-label="Send message"
-                >
-                  <SendDoodle />
-                </button>
-              </div>
-            )}
-          </motion.div>
+                    <button
+                      type="button"
+                      className="hero-chat-send-action-btn"
+                      onClick={() => handleSendMessage()}
+                      disabled={isLoading || !input.trim()}
+                      aria-label="Send message"
+                    >
+                      <ArrowUp size={18} strokeWidth={2.4} aria-hidden="true" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
 }

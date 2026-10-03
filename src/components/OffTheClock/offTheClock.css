@@ -359,27 +359,29 @@
   }
 }
 
-/* Fixed Height Polaroid Caption Footer */
+/* Fixed Height Polaroid Caption Footer (Never clips, space for 2 lines) */
 .otc-polaroid-footer {
   margin-top: 10px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 58px;
-  min-height: 58px;
+  min-height: 64px;
 }
 
 .otc-polaroid-caption {
   font-family: var(--font-handwriting);
-  font-size: 1.25rem;
+  font-size: 1.15rem; /* ~18px, min 15px */
   line-height: 1.2;
   color: var(--ink);
-  margin: 0;
+  margin: 0 0 4px 0;
+  min-height: 2.4em; /* space for 2 lines */
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
+  padding-bottom: 2px;
 }
 
 @media (min-width: 1024px) {
@@ -535,7 +537,7 @@
 
 .otc-lightbox-photo-wrap {
   width: 100%;
-  max-height: 60dvh;
+  max-height: 80dvh;
   background: var(--bg-raised);
   display: flex;
   align-items: center;
@@ -546,7 +548,7 @@
 
 .otc-lightbox-img {
   width: 100%;
-  max-height: 60dvh;
+  max-height: 80dvh;
   object-fit: contain;
   display: block;
 }
@@ -992,32 +994,441 @@
 }
 
 /* --------------------------------------------------------------------------
-   10. Mobile and Small Screen Adjustments (< 430px)
+   10. Mobile Photo Booth Collection & Swipe Board (<= 768px)
+   -------------------------------------------------------------------------- */
+.otc-mobile-booth-wrapper {
+  width: 100%;
+  margin: 0.5rem auto 1.5rem;
+}
+
+/* 1. Collapsed State: ONE compact collection card (70 to 80dvh max) */
+.otc-collection-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 0.5rem;
+  min-height: 440px;
+  max-height: 78dvh;
+}
+
+.otc-pile-interactive-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 1rem;
+  border-radius: 8px;
+  outline: none;
+  user-select: none;
+  touch-action: manipulation;
+  transition: transform 0.2s var(--ease-editorial);
+}
+
+.otc-pile-interactive-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+.otc-pile-card-stack {
+  position: relative;
+  width: 250px;
+  height: 320px;
+}
+
+/* 4 peeking cards underneath with soft layered shadows and angles */
+.otc-pile-under-card {
+  position: absolute;
+  inset: 0;
+  background: #FFFFFF;
+  border: 1px solid var(--border-medium);
+  border-radius: 3px;
+  box-shadow: 0 8px 22px -3px rgba(22, 21, 15, 0.12);
+  pointer-events: none;
+  transition: transform 0.3s var(--ease-editorial);
+}
+
+.otc-pile-top-card {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  box-shadow: 0 16px 36px -4px rgba(22, 21, 15, 0.18) !important;
+  cursor: pointer;
+  margin: 0;
+}
+
+.otc-collection-label-group {
+  margin-top: 1.25rem;
+  text-align: center;
+}
+
+.otc-collection-title {
+  font-family: var(--font-handwriting);
+  font-size: 1.85rem;
+  color: var(--ink);
+  margin: 0 0 0.2rem 0;
+  line-height: 1.2;
+}
+
+.otc-collection-caption {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.otc-collection-hint-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 0.4rem;
+}
+
+.otc-collection-arrow-svg {
+  width: 38px;
+  height: 22px;
+  color: var(--ink-muted);
+  flex-shrink: 0;
+}
+
+.otc-collection-hint-text {
+  font-family: var(--font-handwriting);
+  font-size: 1.2rem;
+  color: var(--ink-muted);
+}
+
+/* 2. Open Layout: Horizontal Swipe Board */
+.otc-open-collection-view {
+  width: 100%;
+  max-height: 98dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
+
+.otc-mobile-board-header {
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  padding: 0 0.5rem;
+  margin-bottom: 0.65rem;
+}
+
+.otc-counter-chip {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--bg-raised);
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-hairline);
+  white-space: nowrap;
+}
+
+.otc-counter-sep {
+  color: var(--ink-faint);
+  margin: 0 2px;
+}
+
+.otc-progress-track {
+  flex: 1;
+  height: 4px;
+  background: rgba(22, 21, 15, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.otc-progress-bar {
+  height: 100%;
+  background: var(--ink);
+  border-radius: 2px;
+  transition: width 0.18s ease-out;
+}
+
+.otc-horizontal-swipe-board {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  touch-action: pan-y pan-x;
+  padding: 8px calc((100vw - clamp(240px, 72vw, 300px)) / 2) 16px;
+  outline: none;
+}
+
+.otc-horizontal-swipe-board::-webkit-scrollbar {
+  display: none;
+}
+
+.otc-polaroid-mobile {
+  width: clamp(240px, 72vw, 300px);
+  flex-shrink: 0;
+  scroll-snap-align: center;
+  cursor: pointer;
+  transition: box-shadow 0.25s ease, transform 0.25s var(--ease-editorial);
+  box-shadow: 0 8px 20px -3px rgba(22, 21, 15, 0.12);
+}
+
+.otc-polaroid-mobile.is-centered {
+  box-shadow: 0 16px 36px -4px rgba(22, 21, 15, 0.22);
+}
+
+.otc-mobile-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+  width: 100%;
+}
+
+.otc-mobile-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0.45rem 0.8rem;
+  min-height: 44px;
+  background: #FFFFFF;
+  border: 1px solid var(--border-medium);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.otc-mobile-action-btn.is-active {
+  background: var(--ink);
+  color: #FFFFFF;
+  border-color: var(--ink);
+}
+
+.otc-mobile-action-btn:active {
+  transform: scale(0.97);
+}
+
+/* Mini 4-Column Contact Sheet for Mobile */
+.otc-mobile-contact-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  width: 100%;
+  max-width: 320px;
+  padding: 0.5rem 0;
+  margin: 0 auto;
+}
+
+.otc-mobile-contact-thumb-btn {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border: 1px solid var(--border-medium);
+  border-radius: 3px;
+  overflow: hidden;
+  background: #FFFFFF;
+  padding: 0;
+  cursor: pointer;
+  min-height: 44px;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.otc-mobile-contact-thumb-btn.is-active {
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
+}
+
+.otc-mobile-contact-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.otc-mobile-contact-num {
+  position: absolute;
+  bottom: 2px;
+  right: 3px;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+  background: rgba(22, 21, 15, 0.5);
+  padding: 1px 3px;
+  border-radius: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   11. Shorter Doodle Corner on Mobile (<= 640px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .otc-doodle-corner {
+    padding: 1.25rem 0.85rem;
+    box-shadow: 0 2px 10px -2px rgba(22, 21, 15, 0.04);
+  }
+
+  /* Ruled lines tightened to 24px to match text and compact height by ~40% */
+  .otc-notebook-ruled {
+    background-size: 100% 24px;
+  }
+
+  .otc-doodle-head {
+    margin-bottom: 1.15rem;
+  }
+
+  .otc-doodle-title {
+    font-size: 1.75rem;
+    line-height: 1.15;
+    margin-bottom: 0.25rem;
+  }
+
+  .otc-doodle-subtitle {
+    font-size: 0.8125rem;
+    line-height: 1.35;
+  }
+
+  /* 3 rows of 2 doodles with row gap 22-24px */
+  .otc-doodles-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px 12px;
+    margin-bottom: 1.25rem;
+  }
+
+  .otc-doodle-card {
+    padding: 0.25rem;
+  }
+
+  /* Doodle SVG tightened to 76px (within 72 to 84px) */
+  .otc-doodle-svg {
+    width: 76px;
+    height: 76px;
+  }
+
+  /* Labels max 2 lines, no clipping */
+  .otc-doodle-label {
+    font-size: 1.05rem;
+    line-height: 1.15;
+    margin-top: 0.25rem;
+    max-width: 135px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Hide emoji on mobile to prevent clutter and wrapping */
+  .otc-doodle-emoji {
+    display: none !important;
+  }
+
+  /* Hide the 2 requested doodles on mobile (keeps 6 doodles) */
+  .otc-doodle-hide-mobile {
+    display: none !important;
+  }
+
+  .otc-sticky-row {
+    margin: 1.15rem 0;
+    gap: 0.85rem;
+    padding-bottom: 1rem;
+  }
+
+  .otc-sticky-note {
+    padding: 12px 14px 10px;
+    max-width: 100%;
+  }
+
+  .otc-sticky-text {
+    font-size: 1.1rem;
+  }
+
+  .otc-sketchpad-section {
+    padding-top: 0.75rem;
+  }
+
+  .otc-sketchpad-header {
+    margin-bottom: 0.75rem;
+  }
+
+  .otc-sketchpad-toolbar {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 0.5rem;
+  }
+
+  /* 44px minimum tap targets on mobile */
+  .otc-swatches-group {
+    min-height: 44px;
+    gap: 8px;
+  }
+
+  .otc-color-pill {
+    width: 28px;
+    height: 28px;
+  }
+
+  .otc-size-btn {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8125rem;
+  }
+
+  .otc-icon-btn {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .otc-stamp-btn {
+    min-height: 44px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+
+  /* Full width sketchpad with min-height 260px */
+  .otc-canvas-wrap {
+    width: 100%;
+    height: 260px;
+    min-height: 260px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   12. Small Screen Adjustments (< 430px)
    -------------------------------------------------------------------------- */
 @media (max-width: 430px) {
-  .otc-scatter-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.25rem 0.75rem;
-  }
   .otc-polaroid {
     padding: 8px 8px 10px 8px;
   }
   .otc-polaroid-caption {
-    font-size: 1.05rem;
+    font-size: 1.05rem; /* ~16.8px, strictly >= 15px */
+    min-height: 2.4em;
+    line-height: 1.2;
+    margin-bottom: 4px;
   }
   .otc-polaroid-footer {
-    height: 52px;
-    min-height: 52px;
-  }
-  .otc-doodles-grid {
-    gap: 1rem 0.75rem;
-  }
-  .otc-doodle-svg {
-    width: 72px;
-    height: 72px;
-  }
-  .otc-doodle-label {
-    font-size: 1.1rem;
+    min-height: 64px;
+    height: auto;
   }
 }
 
