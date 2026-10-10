@@ -46,7 +46,7 @@ export const photos = [
     caption: 'Learning outside the classroom',
     tag: 'INDUSTRIAL VISIT',
     objectPosition: 'center 10%', // Crops bottom GPS map stamp out
-    rotation: -2.8,
+    rotation: -2.3,
     tape: 'lime'
   },
   {
@@ -56,7 +56,7 @@ export const photos = [
     caption: 'Sleepless, caffeinated, building',
     tag: 'HACKATHON',
     objectPosition: 'center 62%',
-    rotation: 2.2,
+    rotation: 2.0,
     tape: 'kraft'
   },
   {
@@ -76,7 +76,7 @@ export const photos = [
     caption: 'Ten days, sixty hours, lots of code',
     tag: 'INTERNSHIP',
     objectPosition: 'center 20%',
-    rotation: 2.6,
+    rotation: 2.2,
     tape: 'lime'
   },
   {
@@ -86,7 +86,7 @@ export const photos = [
     caption: 'NSS morning, full energy',
     tag: 'NSS',
     objectPosition: 'center 24%',
-    rotation: -2.5,
+    rotation: -2.4,
     tape: 'cream'
   },
   {
@@ -96,7 +96,7 @@ export const photos = [
     caption: 'Rain, raincoats, zero regrets',
     tag: 'RAINY OUT',
     objectPosition: 'center 38%',
-    rotation: 3.2,
+    rotation: 2.3,
     tape: 'kraft'
   },
   {
@@ -116,7 +116,7 @@ export const photos = [
     caption: 'Where it all started',
     tag: 'SCHOOL',
     objectPosition: 'center 18%',
-    rotation: 2.0,
+    rotation: 1.9,
     tape: 'cream'
   },
   {
@@ -126,7 +126,7 @@ export const photos = [
     caption: 'My college people',
     tag: 'COLLEGE',
     objectPosition: 'center 22%',
-    rotation: -2.9,
+    rotation: -2.2,
     tape: 'lime'
   },
   {
@@ -146,7 +146,7 @@ export const photos = [
     caption: 'Tea time, always',
     tag: 'TEA TIME',
     objectPosition: 'center 52%',
-    rotation: -2.1,
+    rotation: -2.0,
     tape: 'none'
   },
   {
@@ -156,7 +156,7 @@ export const photos = [
     caption: 'Onam, dressed to impress',
     tag: 'ONAM',
     objectPosition: 'center 64%',
-    rotation: 2.8,
+    rotation: 2.1,
     tape: 'cream'
   },
   {
@@ -166,7 +166,7 @@ export const photos = [
     caption: 'Argentina jerseys, pure matchday energy',
     tag: 'FANS SHOW',
     objectPosition: 'center 42%',
-    rotation: -2.2,
+    rotation: -1.9,
     tape: 'lime'
   },
   {

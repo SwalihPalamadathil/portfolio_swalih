@@ -37,7 +37,7 @@ const COLOR_PALETTE = [
 const BRUSH_SIZES = [
   { label: 'Fine', value: 2 },
   { label: 'Med', value: 5 },
-  { label: 'Bold', value: 10 }
+  { label: 'Bold', value: 9 }
 ];
 
 export default function DoodleCorner() {
@@ -45,6 +45,7 @@ export default function DoodleCorner() {
 
   // Canvas state
   const canvasRef = useRef(null);
+  const containerRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [activeColor, setActiveColor] = useState('#16150F');
   const [brushSize, setBrushSize] = useState(3);
@@ -62,6 +63,7 @@ export default function DoodleCorner() {
     if (!parent) return;
 
     const rect = parent.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return;
     const dpr = window.devicePixelRatio || 1;
 
     let tempCanvas = null;
@@ -126,8 +128,8 @@ export default function DoodleCorner() {
     ctx.moveTo(x, y);
 
     if (isEraser) {
-      ctx.strokeStyle = '#FAF8F3';
-      ctx.lineWidth = brushSize * 3;
+      ctx.strokeStyle = '#FAF7EE'; // Matches ivory notebook page
+      ctx.lineWidth = brushSize * 3.5;
     } else {
       ctx.strokeStyle = activeColor;
       ctx.lineWidth = brushSize;
@@ -150,30 +152,34 @@ export default function DoodleCorner() {
   };
 
   const handleUndo = () => {
-    if (historyRef.current.length === 0) return;
     const canvas = canvasRef.current;
+    if (!canvas || historyRef.current.length === 0) return;
     const ctx = canvas.getContext('2d');
-    const currentState = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    redoRef.current.push(currentState);
-    const previousState = historyRef.current.pop();
-    ctx.putImageData(previousState, 0, 0);
+    const currentImg = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    redoRef.current.push(currentImg);
+
+    const prevState = historyRef.current.pop();
+    ctx.putImageData(prevState, 0, 0);
   };
 
   const handleRedo = () => {
-    if (redoRef.current.length === 0) return;
     const canvas = canvasRef.current;
+    if (!canvas || redoRef.current.length === 0) return;
     const ctx = canvas.getContext('2d');
-    const currentState = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    historyRef.current.push(currentState);
+    const currentImg = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    historyRef.current.push(currentImg);
+
     const nextState = redoRef.current.pop();
     ctx.putImageData(nextState, 0, 0);
   };
 
   const handleClear = () => {
-    saveState();
     const canvas = canvasRef.current;
+    if (!canvas) return;
+    saveState();
     const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const dpr = window.devicePixelRatio || 1;
+    ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
     setHasDrawn(false);
   };
 
@@ -181,14 +187,15 @@ export default function DoodleCorner() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    // Create a temporary canvas with ivory notebook background
     const exportCanvas = document.createElement('canvas');
     exportCanvas.width = canvas.width;
     exportCanvas.height = canvas.height;
-    const expCtx = exportCanvas.getContext('2d');
+    const exportCtx = exportCanvas.getContext('2d');
 
-    expCtx.fillStyle = '#FAF8F3';
-    expCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
-    expCtx.drawImage(canvas, 0, 0);
+    exportCtx.fillStyle = '#FAF7EE';
+    exportCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+    exportCtx.drawImage(canvas, 0, 0);
 
     const link = document.createElement('a');
     link.download = 'swalih-doodle-sketch.png';
@@ -201,16 +208,18 @@ export default function DoodleCorner() {
     if (!canvas) return;
     saveState();
     setHasDrawn(true);
-
     const ctx = canvas.getContext('2d');
-    const rect = canvas.getBoundingClientRect();
-    const x = rect.width / 2 + (Math.random() * 80 - 40);
-    const y = rect.height / 2 + (Math.random() * 40 - 20);
+    const dpr = window.devicePixelRatio || 1;
+    const w = canvas.width / dpr;
+    const h = canvas.height / dpr;
+
+    const x = w * (0.25 + Math.random() * 0.5);
+    const y = h * (0.25 + Math.random() * 0.5);
 
     ctx.save();
     ctx.translate(x, y);
-    ctx.strokeStyle = activeColor === '#FAF8F3' ? '#16150F' : activeColor;
-    ctx.fillStyle = activeColor === '#FAF8F3' ? '#16150F' : activeColor;
+    ctx.strokeStyle = activeColor;
+    ctx.fillStyle = activeColor;
     ctx.lineWidth = 2.2;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
@@ -218,23 +227,20 @@ export default function DoodleCorner() {
     if (stampType === 'star') {
       ctx.beginPath();
       for (let i = 0; i < 5; i++) {
-        ctx.lineTo(
-          Math.cos(((18 + i * 72) * Math.PI) / 180) * 16,
-          -Math.sin(((18 + i * 72) * Math.PI) / 180) * 16
-        );
-        ctx.lineTo(
-          Math.cos(((54 + i * 72) * Math.PI) / 180) * 7,
-          -Math.sin(((54 + i * 72) * Math.PI) / 180) * 7
-        );
+        const outerAngle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+        const sx = Math.cos(outerAngle) * 14;
+        const sy = Math.sin(outerAngle) * 14;
+        if (i === 0) ctx.moveTo(sx, sy);
+        else ctx.lineTo(sx, sy);
       }
       ctx.closePath();
       ctx.stroke();
     } else if (stampType === 'heart') {
       ctx.beginPath();
-      ctx.moveTo(0, 5);
-      ctx.bezierCurveTo(-14, -12, -22, 6, 0, 20);
-      ctx.bezierCurveTo(22, 6, 14, -12, 0, 5);
-      ctx.fill();
+      ctx.moveTo(0, 4);
+      ctx.bezierCurveTo(-10, -8, -14, 2, 0, 16);
+      ctx.bezierCurveTo(14, 2, 10, -8, 0, 4);
+      ctx.stroke();
     } else if (stampType === 'bug') {
       ctx.beginPath();
       ctx.arc(0, 0, 8, 0, Math.PI * 2);
@@ -350,7 +356,7 @@ export default function DoodleCorner() {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              custom={0.3}
+              custom={0.28}
             />
           </svg>
         );
@@ -358,7 +364,7 @@ export default function DoodleCorner() {
         return (
           <svg className="otc-doodle-svg" viewBox="0 0 100 100" fill="none" aria-hidden="true">
             <motion.path
-              d="M 50 78 Q 44 50 56 28"
+              d="M 48 85 Q 52 50 46 25"
               stroke="var(--ink)"
               strokeWidth="2.6"
               strokeLinecap="round"
@@ -366,11 +372,11 @@ export default function DoodleCorner() {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              custom={0.12}
+              custom={0.1}
             />
             <motion.path
-              d="M 56 28 Q 30 20 20 32 M 56 28 Q 75 16 84 28 M 56 28 Q 40 10 52 4 M 56 28 Q 68 12 76 8"
-              stroke="var(--ink)"
+              d="M 46 25 C 32 20, 22 26, 18 36 M 46 25 C 38 14, 28 14, 22 22 M 46 25 C 56 12, 68 14, 76 22 M 46 25 C 64 18, 76 28, 80 40 M 46 25 C 58 28, 66 36, 70 48"
+              stroke="var(--accent)"
               strokeWidth="2.2"
               strokeLinecap="round"
               variants={drawVariant}
@@ -380,17 +386,15 @@ export default function DoodleCorner() {
               custom={0.22}
             />
             <motion.circle
-              cx="52"
-              cy="31"
+              cx="44"
+              cy="30"
               r="3.5"
-              fill="var(--accent)"
-              stroke="var(--accent-ink)"
-              strokeWidth="1.2"
+              fill="var(--ink)"
               variants={drawVariant}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              custom={0.32}
+              custom={0.34}
             />
           </svg>
         );
@@ -400,7 +404,19 @@ export default function DoodleCorner() {
             <motion.circle
               cx="28"
               cy="68"
-              r="8"
+              r="11"
+              stroke="var(--ink)"
+              strokeWidth="2.4"
+              variants={drawVariant}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              custom={0.08}
+            />
+            <motion.circle
+              cx="72"
+              cy="68"
+              r="11"
               stroke="var(--ink)"
               strokeWidth="2.4"
               variants={drawVariant}
@@ -409,87 +425,91 @@ export default function DoodleCorner() {
               viewport={{ once: true }}
               custom={0.15}
             />
-            <motion.circle
-              cx="72"
-              cy="68"
-              r="8"
+            <motion.path
+              d="M 28 68 H 54 L 64 42 H 72 M 64 42 L 56 32 H 48"
               stroke="var(--ink)"
-              strokeWidth="2.4"
+              strokeWidth="2.3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
               variants={drawVariant}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              custom={0.22}
+              custom={0.24}
             />
             <motion.path
-              d="M 28 68 H 48 L 56 46 H 70 L 64 32 H 58"
-              stroke="var(--ink)"
-              strokeWidth="2.4"
+              d="M 38 52 Q 48 50 56 52"
+              stroke="var(--accent)"
+              strokeWidth="2.5"
               strokeLinecap="round"
               variants={drawVariant}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              custom={0.3}
-            />
-            <motion.circle
-              cx="67"
-              cy="33"
-              r="2.5"
-              fill="var(--accent)"
-              variants={drawVariant}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              custom={0.38}
+              custom={0.32}
             />
           </svg>
         );
       case 'git-branch':
         return (
           <svg className="otc-doodle-svg" viewBox="0 0 100 100" fill="none" aria-hidden="true">
-            <motion.path
-              d="M 32 20 V 78"
+            <motion.circle
+              cx="34"
+              cy="28"
+              r="6"
               stroke="var(--ink)"
-              strokeWidth="2.4"
-              strokeLinecap="round"
+              strokeWidth="2.3"
+              variants={drawVariant}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              custom={0.08}
+            />
+            <motion.circle
+              cx="34"
+              cy="72"
+              r="6"
+              stroke="var(--ink)"
+              strokeWidth="2.3"
               variants={drawVariant}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
               custom={0.16}
             />
-            <motion.path
-              d="M 32 54 Q 52 50 66 36"
-              stroke="var(--ink)"
-              strokeWidth="2.4"
-              strokeLinecap="round"
-              variants={drawVariant}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              custom={0.25}
-            />
-            <motion.circle cx="32" cy="28" r="4" fill="var(--ink)" />
-            <motion.circle cx="32" cy="70" r="4" fill="var(--ink)" />
             <motion.circle
               cx="66"
-              cy="36"
-              r="4"
-              fill="var(--accent)"
+              cy="42"
+              r="6"
               stroke="var(--accent-ink)"
-              strokeWidth="1.2"
+              fill="var(--accent)"
+              strokeWidth="2"
+              variants={drawVariant}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              custom={0.24}
             />
             <motion.path
-              d="M 78 26 L 78 34 M 78 38 L 78 40"
-              stroke="var(--accent-ink)"
-              strokeWidth="2"
+              d="M 34 34 V 66"
+              stroke="var(--ink)"
+              strokeWidth="2.3"
+              variants={drawVariant}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              custom={0.3}
+            />
+            <motion.path
+              d="M 34 56 C 34 46, 48 42, 60 42"
+              stroke="var(--ink)"
+              strokeWidth="2.3"
               strokeLinecap="round"
               variants={drawVariant}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              custom={0.35}
+              custom={0.36}
             />
           </svg>
         );
@@ -628,68 +648,64 @@ export default function DoodleCorner() {
   };
 
   return (
-    <div className="otc-doodle-corner otc-notebook-ruled" aria-label="Doodle Corner">
-      {/* Section Head */}
-      <div className="otc-doodle-head">
-        <h3 className="otc-doodle-title">{doodleHeader.title}</h3>
-        <p className="otc-doodle-subtitle">{doodleHeader.subtitle}</p>
-      </div>
+    <div
+      ref={containerRef}
+      className="otc-notebook-spread"
+      aria-label="Open notebook spread: Doodles and Sketchpad"
+    >
+      {/* Corner washi tape strips on the open notebook */}
+      <div className="otc-notebook-tape otc-notebook-tape-tl" aria-hidden="true" />
+      <div className="otc-notebook-tape otc-notebook-tape-tr" aria-hidden="true" />
 
-      {/* Curated Story Doodles (8 on desktop, 6 on mobile <= 640px via hideOnMobile flag) */}
-      <div className="otc-doodles-grid">
-        {doodlesList.map((doodle, index) => {
-          const isTiltedOdd = index % 2 !== 0;
+      {/* Subtle center spine shadow for the two-page spread */}
+      <div className="otc-notebook-spine" aria-hidden="true" />
 
-          return (
+      {/* =====================================================================
+          LEFT PAGE: Doodles (8 in 2 columns on desktop, 6 on mobile)
+          ===================================================================== */}
+      <div className="otc-notebook-page otc-notebook-page-left">
+        <div className="otc-doodle-head">
+          <h3 className="otc-doodle-title">{doodleHeader.title}</h3>
+          <div className="otc-sticky-washi-note" aria-hidden="true">
+            <span>“it works on my machine”</span>
+          </div>
+        </div>
+
+        {/* Curated Story Doodles in a strict 2-column grid, centered handwritten labels */}
+        <div className="otc-doodles-grid">
+          {doodlesList.map((doodle, index) => (
             <motion.div
               key={doodle.id}
               className={`otc-doodle-card ${doodle.hideOnMobile ? 'otc-doodle-hide-mobile' : ''}`}
-              whileHover={shouldReduceMotion ? {} : { rotate: isTiltedOdd ? 2 : -2, y: -4 }}
-              whileTap={
-                shouldReduceMotion
-                  ? {}
-                  : {
-                      scale: 0.94,
-                      rotate: [-2, 2, -1, 0],
-                      transition: { duration: 0.25 }
-                    }
-              }
+              whileHover={shouldReduceMotion ? {} : { rotate: index % 2 === 0 ? -1.8 : 1.8, y: -3 }}
+              whileTap={shouldReduceMotion ? {} : { scale: 0.95 }}
             >
-              {renderDoodleSvg(doodle.id)}
+              <div className="otc-doodle-svg-wrap">
+                {renderDoodleSvg(doodle.id)}
+              </div>
               <span className="otc-doodle-label">
-                <span className="otc-doodle-text">{doodle.label}</span>
-                <span className="otc-doodle-emoji" aria-hidden="true">
-                  {doodle.emoji}
-                </span>
+                {doodle.label}
               </span>
             </motion.div>
-          );
-        })}
-      </div>
-
-      {/* Sticky note tape reminders */}
-      <div className="otc-sticky-row">
-        <div className="otc-sticky-note otc-sticky-tilt-left">
-          <div className="otc-tape otc-tape-cream" aria-hidden="true" />
-          <p className="otc-sticky-text">“debugging is just detective work where you are also the criminal.”</p>
-        </div>
-        <div className="otc-sticky-note otc-sticky-tilt-right">
-          <div className="otc-tape otc-tape-lime" aria-hidden="true" />
-          <p className="otc-sticky-text">“it worked yesterday, so today it is a feature.”</p>
+          ))}
         </div>
       </div>
 
-      {/* Interactive Sketchpad (stays below, full width, min height 260px, touch-action: none ONLY on canvas) */}
-      <div className="otc-sketchpad-section">
+      {/* =====================================================================
+          RIGHT PAGE: Interactive Sketchpad (Equal height to left page on desktop)
+          ===================================================================== */}
+      <div className="otc-notebook-page otc-notebook-page-right">
         <div className="otc-sketchpad-header">
-          <h4 className="otc-sketchpad-title">
-            <PenTool size={18} aria-hidden="true" />
-            <span>Interactive Sketchpad</span>
-          </h4>
+          <div className="otc-sketchpad-title-row">
+            <h4 className="otc-sketchpad-title">
+              <PenTool size={16} aria-hidden="true" />
+              <span>Interactive Sketchpad</span>
+            </h4>
+          </div>
 
-          {/* Controls: Colors, Sizes, Eraser, Undo, Redo, Clear, Download */}
+          {/* Controls: Color Swatches, Brush Sizes, Tools */}
           <div className="otc-sketchpad-toolbar" role="toolbar" aria-label="Drawing tools">
-            {/* Color Swatches */}
+            {/* Swatches */}
             <div className="otc-swatches-group">
               {COLOR_PALETTE.map((c) => (
                 <button
@@ -707,14 +723,17 @@ export default function DoodleCorner() {
               ))}
             </div>
 
-            {/* Brush sizes */}
+            {/* Sizes */}
             <div className="otc-sizes-group">
               {BRUSH_SIZES.map((b) => (
                 <button
                   key={b.label}
                   type="button"
-                  className={`otc-size-btn ${brushSize === b.value ? 'is-active' : ''}`}
-                  onClick={() => setBrushSize(b.value)}
+                  className={`otc-size-btn ${brushSize === b.value && !isEraser ? 'is-active' : ''}`}
+                  onClick={() => {
+                    setBrushSize(b.value);
+                    setIsEraser(false);
+                  }}
                   aria-label={`${b.label} brush size (${b.value}px)`}
                 >
                   {b.label}
@@ -781,9 +800,9 @@ export default function DoodleCorner() {
           </div>
         </div>
 
-        {/* Quick Doodle Stamps Row */}
+        {/* Stamps Row */}
         <div className="otc-stamps-bar" aria-label="Stamp stickers onto canvas">
-          <span className="otc-stamps-label">Tap to stamp:</span>
+          <span className="otc-stamps-label">Stamp:</span>
           <button
             type="button"
             className="otc-stamp-btn"
@@ -791,7 +810,7 @@ export default function DoodleCorner() {
             title="Stamp a Star"
             aria-label="Stamp a Star"
           >
-            <Star size={14} /> Star
+            <Star size={13} /> Star
           </button>
           <button
             type="button"
@@ -800,7 +819,7 @@ export default function DoodleCorner() {
             title="Stamp a Heart"
             aria-label="Stamp a Heart"
           >
-            <Heart size={14} /> Heart
+            <Heart size={13} /> Heart
           </button>
           <button
             type="button"
@@ -809,20 +828,20 @@ export default function DoodleCorner() {
             title="Stamp a Bug"
             aria-label="Stamp a Bug"
           >
-            <Bug size={14} /> Bug
+            <Bug size={13} /> Bug
           </button>
           <button
             type="button"
             className="otc-stamp-btn"
             onClick={() => addStamp('coffee')}
-            title="Stamp a Tea Cup"
-            aria-label="Stamp a Tea Cup"
+            title="Stamp Tea"
+            aria-label="Stamp Tea"
           >
-            <Coffee size={14} /> Tea
+            <Coffee size={13} /> Tea
           </button>
         </div>
 
-        {/* Canvas Area */}
+        {/* Canvas Area: touch-action: none ONLY on the canvas */}
         <div className="otc-canvas-wrap">
           {!hasDrawn && (
             <div className="otc-canvas-hint" aria-hidden="true">

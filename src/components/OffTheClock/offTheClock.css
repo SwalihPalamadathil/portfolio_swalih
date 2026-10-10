@@ -1,9 +1,11 @@
 /* ==========================================================================
-   OFF THE CLOCK — EDITORIAL DESIGN SYSTEM & STYLES (REVISED V2)
+   OFF THE CLOCK — EDITORIAL DESIGN SYSTEM ("THE WALL" & NOTEBOOK SPREAD)
    ========================================================================== */
 
 :root {
   --font-handwriting: 'Caveat', cursive, sans-serif;
+  --wall-col-gap: 36px;
+  --wall-row-gap: 44px;
 }
 
 /* --------------------------------------------------------------------------
@@ -13,19 +15,19 @@
   position: relative;
   background-color: var(--bg);
   color: var(--ink);
-  padding-top: clamp(4.5rem, 8vw, 7rem);
+  padding-top: clamp(4rem, 7vw, 6.5rem);
   padding-bottom: clamp(4.5rem, 8vw, 7rem);
   border-bottom: 1px solid var(--border-hairline);
   overflow-x: hidden;
 }
 
-/* Subtle paper grain texture overlay (pure SVG noise at 3.5% opacity) */
+/* Paper Grain Texture (pure SVG noise overlay at 3% opacity) */
 .otc-grain-texture {
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='otcGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23otcGrain)' opacity='0.035'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='otcGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23otcGrain)' opacity='0.03'/%3E%3C/svg%3E");
 }
 
 .otc-container {
@@ -34,10 +36,24 @@
 }
 
 /* --------------------------------------------------------------------------
-   2. Section Header
+   2. Section Header: Desktop Two-Column, Mobile Stacked
    -------------------------------------------------------------------------- */
 .otc-header {
-  margin-bottom: clamp(1.75rem, 3.5vw, 2.5rem);
+  margin-bottom: clamp(2rem, 3.5vw, 3rem);
+}
+
+.otc-header-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem 2.5rem;
+  flex-wrap: wrap;
+}
+
+.otc-header-left {
+  display: flex;
+  flex-direction: column;
+  max-width: 680px;
 }
 
 .otc-wayfinding {
@@ -88,32 +104,66 @@
   margin: 0.4rem 0 0 0;
 }
 
-.otc-lead-note {
-  font-family: var(--font-sans);
-  font-size: 0.9375rem;
+/* Header Right: Stats Row + Downward Hand-Drawn Arrow (Desktop only) */
+.otc-header-right {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .otc-header-right {
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 0.25rem;
+  }
+}
+
+.otc-header-stats-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.95rem;
+  background: rgba(22, 21, 15, 0.03);
+  border: 1px dashed var(--border-medium);
+  border-radius: 6px;
+}
+
+.otc-header-stats-text {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
   color: var(--ink-muted);
-  margin-top: 0.4rem;
-  max-width: 60ch;
-  line-height: 1.5;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.otc-header-down-arrow {
+  width: 20px;
+  height: 22px;
+  flex-shrink: 0;
 }
 
 /* --------------------------------------------------------------------------
-   3. Photo Booth Component
+   3. Photo Booth Component: "The Wall" (Desktop & Laptop)
    -------------------------------------------------------------------------- */
 .otc-photobooth {
-  margin-bottom: clamp(3.5rem, 6vw, 5rem);
+  margin-bottom: clamp(3.5rem, 6vw, 5.5rem);
 }
 
-/* Tidy Controls Toolbar (Filter chips deleted, tight gap) */
+.otc-wall-desktop-container {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Toolbar */
 .otc-booth-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 0.75rem 1.25rem;
-  margin-top: 1rem;
+  gap: 0.85rem 1.5rem;
+  margin-top: 0.5rem;
   margin-bottom: 1.5rem;
-  padding-bottom: 0.75rem;
+  padding-bottom: 0.85rem;
   border-bottom: 1px dashed var(--border-hairline);
 }
 
@@ -121,15 +171,13 @@
   font-family: var(--font-handwriting);
   font-size: 1.25rem;
   color: var(--ink-muted);
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
+  line-height: 1.2;
 }
 
 .otc-toolbar-actions {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.65rem;
   flex-wrap: wrap;
 }
 
@@ -137,7 +185,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  padding: 0.5rem 0.95rem;
+  padding: 0.5rem 0.9rem;
   background: #FFFFFF;
   border: 1px solid var(--border-medium);
   border-radius: 4px;
@@ -153,10 +201,11 @@
 .otc-icon-btn:hover {
   background: var(--bg-raised);
   border-color: var(--ink);
+  transform: translateY(-1px);
 }
 
 .otc-icon-btn:active {
-  transform: translateY(1px);
+  transform: scale(0.98);
 }
 
 .otc-icon-btn:focus-visible {
@@ -164,30 +213,33 @@
   outline-offset: 2px;
 }
 
-.otc-icon-btn.is-active {
-  background: var(--ink);
-  color: #FFFFFF;
-  border-color: var(--ink);
+.otc-btn-reset-order {
+  border-style: dashed;
+  color: var(--ink-muted);
 }
 
-/* View toggle switch */
+.otc-btn-reset-order:hover {
+  color: var(--ink);
+}
+
+/* View Mode Toggle */
 .otc-view-toggle {
   display: inline-flex;
+  align-items: center;
   background: var(--bg-raised);
-  border: 1px solid var(--border-hairline);
-  padding: 3px;
-  border-radius: 6px;
-  gap: 2px;
+  border: 1px solid var(--border-medium);
+  border-radius: 4px;
+  padding: 2px;
 }
 
 .otc-toggle-btn {
-  padding: 0.4rem 0.85rem;
-  border: none;
+  padding: 0.45rem 0.8rem;
   background: transparent;
+  border: none;
+  border-radius: 3px;
   font-family: var(--font-mono);
   font-size: 0.75rem;
   color: var(--ink-muted);
-  border-radius: 4px;
   cursor: pointer;
   min-height: 38px;
   display: inline-flex;
@@ -202,93 +254,116 @@
   box-shadow: 0 1px 3px rgba(22, 21, 15, 0.08);
 }
 
-/* Pinned Board Grid Surface */
-.otc-board {
-  position: relative;
-  min-height: 480px;
-  padding: 1.5rem 0.5rem;
-  border-radius: 8px;
+.otc-toggle-btn:focus-visible {
+  outline: 2px solid var(--ink);
 }
 
-.otc-board-pinned {
+/* Desk Surface / Dotted Grid */
+.otc-wall-surface {
+  position: relative;
+  background-color: var(--bg);
   background-image: radial-gradient(var(--border-hairline) 1.2px, transparent 1.2px);
   background-size: 24px 24px;
+  padding: 2rem 1.25rem 2.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(22, 21, 15, 0.08);
 }
 
-/* Scatter Grid - strictly aligned cards */
-.otc-scatter-grid {
+/* Strict CSS Grid for "The Wall" */
+.otc-wall-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.75rem 1.25rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--wall-col-gap);
+  row-gap: var(--wall-row-gap);
   align-items: stretch;
 }
 
-@media (min-width: 768px) {
-  .otc-scatter-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2.25rem 1.75rem;
+@media (min-width: 900px) {
+  .otc-wall-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    --wall-col-gap: 36px;
+    --wall-row-gap: 46px;
   }
-}
 
-@media (min-width: 1024px) {
-  .otc-scatter-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2.5rem 2rem;
+  /* Centering the last row (cards 13 & 14) in 3-column layout */
+  .otc-wall-grid > .otc-wall-cell:nth-child(13) {
+    margin-left: calc(50% + var(--wall-col-gap) / 2);
+  }
+  .otc-wall-grid > .otc-wall-cell:nth-child(14) {
+    margin-left: calc(50% + var(--wall-col-gap) / 2);
   }
 }
 
 @media (min-width: 1280px) {
-  .otc-scatter-grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 2.75rem 2rem;
+  .otc-wall-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    --wall-col-gap: 40px;
+    --wall-row-gap: 50px;
   }
 
-  /* Intentionally center the last two cards (13 and 14) in the 4-column layout */
-  .otc-scatter-grid > .otc-polaroid:nth-child(13) {
-    grid-column: 2;
+  /* Reset 3-column offset, then center cards 13 & 14 in 4-column layout */
+  .otc-wall-grid > .otc-wall-cell:nth-child(13) {
+    grid-column-start: 2;
+    margin-left: 0;
+  }
+  .otc-wall-grid > .otc-wall-cell:nth-child(14) {
+    grid-column-start: 3;
+    margin-left: 0;
   }
 }
 
-/* Polaroid Card - Fixed Identical Geometry */
-.otc-polaroid {
+/* Protected Outer Cell: keeps strict bounding box that never rotates */
+.otc-wall-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 14px; /* Protected cell margin: rotation & hover never breach cell boundary */
+  box-sizing: border-box;
+}
+
+/* Inner Polaroid Card: deterministic tilt, paper frame, identical outer size */
+.otc-polaroid-card {
   position: relative;
   background: #FFFFFF;
-  padding: 10px 10px 14px 10px;
-  border: 1px solid rgba(22, 21, 15, 0.07);
+  padding: 11px 11px 14px 11px;
+  border: 1px solid rgba(22, 21, 15, 0.08);
   border-radius: 2px;
-  box-shadow: 0 4px 14px -2px rgba(22, 21, 15, 0.08), 0 1px 3px 0 rgba(22, 21, 15, 0.04);
-  cursor: grab;
-  touch-action: pan-y;
+  box-shadow: 0 4px 14px -2px rgba(22, 21, 15, 0.08), 0 1px 3px rgba(22, 21, 15, 0.04);
+  cursor: pointer;
   user-select: none;
   display: flex;
   flex-direction: column;
   height: 100%;
+  margin: 0;
+  transform-origin: center center;
   transition: box-shadow 0.25s var(--ease-editorial);
 }
 
-.otc-polaroid:hover {
-  box-shadow: 0 14px 28px -6px rgba(22, 21, 15, 0.16), 0 3px 8px -1px rgba(22, 21, 15, 0.08);
+.otc-polaroid-card:hover {
+  z-index: 10;
+  box-shadow: 0 16px 32px -6px rgba(22, 21, 15, 0.18), 0 4px 10px rgba(22, 21, 15, 0.08);
 }
 
-.otc-polaroid:active {
-  cursor: grabbing;
+.otc-polaroid-card:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
 }
 
-/* Washi Tape Variations */
+/* Washi Tape Strips (applied to top edge of ~half cards) */
 .otc-tape {
   position: absolute;
   top: -10px;
   left: 50%;
-  width: 68px;
+  width: 66px;
   height: 20px;
-  z-index: 5;
+  z-index: 6;
   pointer-events: none;
-  opacity: 0.88;
+  opacity: 0.9;
 }
 
 .otc-tape-lime {
   transform: translateX(-50%) rotate(-1.5deg);
-  background: rgba(198, 242, 78, 0.85);
+  background: rgba(198, 242, 78, 0.88);
   border-left: 2px dashed rgba(22, 21, 15, 0.12);
   border-right: 2px dashed rgba(22, 21, 15, 0.12);
 }
@@ -314,7 +389,7 @@
   aspect-ratio: 4 / 5;
   background: var(--bg-raised);
   overflow: hidden;
-  border: 1px solid rgba(22, 21, 15, 0.09);
+  border: 1px solid rgba(22, 21, 15, 0.1);
 }
 
 .otc-polaroid-img {
@@ -325,19 +400,19 @@
   transition: transform 0.4s var(--ease-editorial);
 }
 
-.otc-polaroid:hover .otc-polaroid-img {
-  transform: scale(1.03);
+.otc-polaroid-card:hover .otc-polaroid-img {
+  transform: scale(1.025);
 }
 
-/* Subtle Zoom Badge */
+/* Zoom Icon Overlay */
 .otc-polaroid-zoom-badge {
   position: absolute;
   bottom: 8px;
   right: 8px;
   background: rgba(22, 21, 15, 0.72);
   color: #FFFFFF;
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -347,49 +422,35 @@
   pointer-events: none;
 }
 
-.otc-polaroid:hover .otc-polaroid-zoom-badge,
-.otc-polaroid:focus-within .otc-polaroid-zoom-badge {
+.otc-polaroid-card:hover .otc-polaroid-zoom-badge,
+.otc-polaroid-card:focus-visible .otc-polaroid-zoom-badge {
   opacity: 1;
   transform: scale(1.05);
 }
 
-@media (pointer: coarse) {
-  .otc-polaroid-zoom-badge {
-    opacity: 0.65;
-  }
-}
-
-/* Fixed Height Polaroid Caption Footer (Never clips, space for 2 lines) */
+/* Protected Fixed-Height Caption Footer (Strict 2-line clamp, never overlaps meta) */
 .otc-polaroid-footer {
   margin-top: 10px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 64px;
+  min-height: 66px;
+  padding: 0;
 }
 
 .otc-polaroid-caption {
   font-family: var(--font-handwriting);
-  font-size: 1.15rem; /* ~18px, min 15px */
-  line-height: 1.2;
+  font-size: 1.25rem;
+  line-height: 1.22;
   color: var(--ink);
-  margin: 0 0 4px 0;
-  min-height: 2.4em; /* space for 2 lines */
+  margin: 0 0 6px 0;
+  min-height: 2.45em; /* Always reserves space for 2 lines */
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
   -webkit-box-orient: vertical;
-  padding-bottom: 2px;
-}
-
-@media (min-width: 1024px) {
-  .otc-polaroid-caption {
-    font-size: 1.3rem;
-    white-space: nowrap;
-    -webkit-line-clamp: 1;
-  }
 }
 
 .otc-polaroid-meta {
@@ -420,42 +481,39 @@
 }
 
 /* --------------------------------------------------------------------------
-   4. Contact Sheet Mode (14 frames grid)
+   4. Contact Sheet Mode (14 film-strip frames)
    -------------------------------------------------------------------------- */
 .otc-contact-sheet {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-  background: #191815;
-  padding: 1.5rem;
-  border-radius: 6px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+  background: #181714;
+  padding: 1.75rem;
+  border-radius: 8px;
   border: 1px solid rgba(22, 21, 15, 0.4);
 }
 
 @media (min-width: 640px) {
   .otc-contact-sheet {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
 @media (min-width: 1024px) {
   .otc-contact-sheet {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-@media (min-width: 1280px) {
-  .otc-contact-sheet {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 1.25rem;
   }
 }
 
 .otc-contact-frame {
-  position: relative;
-  background: #23221E;
-  padding: 8px 8px 10px 8px;
+  background: #252420;
   border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  padding: 8px 8px 10px;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
   transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
@@ -464,680 +522,180 @@
   border-color: var(--accent);
 }
 
+.otc-contact-frame:focus-visible {
+  outline: 2px solid var(--accent);
+}
+
 .otc-contact-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  font-family: var(--font-mono);
-  font-size: 0.625rem;
-  color: rgba(255, 255, 255, 0.5);
-  margin-bottom: 5px;
+  justify-content: space-between;
+  margin-bottom: 6px;
 }
 
 .otc-contact-num {
-  color: var(--accent);
-  font-weight: 600;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: #A5A093;
 }
 
 .otc-contact-tag-badge {
-  font-size: 0.5625rem;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--accent);
+  max-width: 65%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .otc-contact-thumb {
   width: 100%;
   aspect-ratio: 4 / 5;
   object-fit: cover;
+  border-radius: 2px;
   display: block;
 }
 
 .otc-contact-caption {
   font-family: var(--font-handwriting);
-  font-size: 1.05rem;
-  color: rgba(255, 255, 255, 0.88);
+  font-size: 1rem;
+  color: #EFEBE1;
   margin-top: 6px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* --------------------------------------------------------------------------
-   5. Lightbox Modal (Viewport-safe max 80dvh, solid dark)
-   -------------------------------------------------------------------------- */
-.otc-lightbox-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(22, 21, 15, 0.88);
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.25rem;
-}
-
-.otc-lightbox-dialog {
-  position: relative;
-  max-width: 600px;
-  width: 100%;
-  max-height: 92dvh;
-  outline: none;
-  display: flex;
-  flex-direction: column;
-}
-
-.otc-lightbox-card {
-  background: #FFFFFF;
-  padding: 14px 14px 18px 14px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
-  border-radius: 3px;
-  display: flex;
-  flex-direction: column;
-}
-
-.otc-lightbox-photo-wrap {
-  width: 100%;
-  max-height: 80dvh;
-  background: var(--bg-raised);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  border: 1px solid rgba(22, 21, 15, 0.08);
-}
-
-.otc-lightbox-img {
-  width: 100%;
-  max-height: 80dvh;
-  object-fit: contain;
-  display: block;
-}
-
-.otc-lightbox-footer {
-  margin-top: 12px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.otc-lightbox-caption {
-  font-family: var(--font-handwriting);
-  font-size: clamp(1.4rem, 2.5vw, 1.85rem);
   line-height: 1.2;
-  color: var(--ink);
-  margin: 0;
-}
-
-.otc-lightbox-tag {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
-  color: var(--ink-muted);
-  text-transform: uppercase;
-  margin-top: 3px;
-}
-
-.otc-lightbox-counter {
-  font-family: var(--font-mono);
-  font-size: 0.8125rem;
-  color: var(--ink-faint);
-  white-space: nowrap;
-  font-weight: 600;
-}
-
-/* Lightbox Thumbnails Strip */
-.otc-lightbox-thumbs {
-  display: none;
-  margin-top: 12px;
-  gap: 6px;
-  overflow-x: auto;
-  padding: 4px;
-  scrollbar-width: none;
-}
-
-@media (min-width: 640px) {
-  .otc-lightbox-thumbs {
-    display: flex;
-  }
-}
-
-.otc-lightbox-thumb-btn {
-  flex: 0 0 46px;
-  height: 46px;
-  border: 1.5px solid rgba(255, 255, 255, 0.3);
-  border-radius: 3px;
-  padding: 0;
-  background: transparent;
-  cursor: pointer;
   overflow: hidden;
-  opacity: 0.6;
-  transition: opacity 0.2s ease, border-color 0.2s ease;
-}
-
-.otc-lightbox-thumb-btn:hover,
-.otc-lightbox-thumb-btn.is-active {
-  opacity: 1;
-  border-color: var(--accent);
-}
-
-.otc-lightbox-thumb-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* Lightbox Nav & Close */
-.otc-lightbox-close {
-  position: absolute;
-  top: -44px;
-  right: 0;
-  background: transparent;
-  border: none;
-  color: #FFFFFF;
-  cursor: pointer;
-  padding: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 44px;
-  min-width: 44px;
-  transition: transform 0.2s ease;
-}
-
-.otc-lightbox-close:hover {
-  transform: scale(1.1);
-}
-
-.otc-lightbox-nav {
-  position: absolute;
-  top: 45%;
-  transform: translateY(-50%);
-  background: rgba(22, 21, 15, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  color: #FFFFFF;
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background 0.2s ease, transform 0.2s ease;
-}
-
-.otc-lightbox-nav:hover {
-  background: rgba(22, 21, 15, 0.95);
-  transform: translateY(-50%) scale(1.08);
-}
-
-.otc-lightbox-prev {
-  left: -58px;
-}
-
-.otc-lightbox-next {
-  right: -58px;
-}
-
-@media (max-width: 768px) {
-  .otc-lightbox-prev {
-    left: 8px;
-  }
-  .otc-lightbox-next {
-    right: 8px;
-  }
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 /* --------------------------------------------------------------------------
-   6. Subtle Hand-Drawn Section Divider
-   -------------------------------------------------------------------------- */
-.otc-section-divider {
-  width: 100%;
-  max-width: 800px;
-  margin: clamp(3rem, 6vw, 4.5rem) auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.otc-divider-svg {
-  width: 100%;
-  height: 12px;
-}
-
-/* --------------------------------------------------------------------------
-   7. Doodle Corner & Interactive Notebook
-   -------------------------------------------------------------------------- */
-.otc-doodle-corner {
-  background: #FFFFFF;
-  border: 1px solid var(--border-medium);
-  border-radius: 8px;
-  padding: clamp(1.5rem, 3.5vw, 2.75rem);
-  box-shadow: 0 4px 18px -2px rgba(22, 21, 15, 0.05);
-  position: relative;
-}
-
-.otc-notebook-ruled {
-  background-image: linear-gradient(var(--border-hairline) 1px, transparent 1px);
-  background-size: 100% 30px;
-}
-
-.otc-doodle-head {
-  margin-bottom: 2rem;
-}
-
-.otc-doodle-title {
-  font-family: var(--font-handwriting);
-  font-size: clamp(2rem, 3.2vw, 2.75rem);
-  color: var(--ink);
-  font-weight: 600;
-  margin: 0 0 0.35rem 0;
-  line-height: 1.2;
-}
-
-.otc-doodle-subtitle {
-  font-family: var(--font-sans);
-  font-size: 0.9rem;
-  color: var(--ink-muted);
-  margin: 0;
-}
-
-/* 8 Doodles Grid: 2 clean rows of 4 on desktop, 2 cols on mobile */
-.otc-doodles-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem 1.25rem;
-  margin-bottom: 2.5rem;
-}
-
-@media (min-width: 768px) {
-  .otc-doodles-grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 2.25rem 1.75rem;
-  }
-}
-
-.otc-doodle-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 0.75rem;
-  border-radius: 6px;
-  transition: transform 0.25s var(--ease-editorial);
-}
-
-.otc-doodle-card:hover {
-  transform: translateY(-3px) scale(1.03);
-}
-
-.otc-doodle-svg {
-  width: 86px;
-  height: 86px;
-  display: block;
-}
-
-.otc-doodle-label {
-  font-family: var(--font-handwriting);
-  font-size: 1.25rem;
-  color: var(--ink);
-  margin-top: 0.4rem;
-  line-height: 1.1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-}
-
-/* Sticky notes row */
-.otc-sticky-row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1.5rem;
-  margin: 2rem 0;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px dashed var(--border-hairline);
-}
-
-.otc-sticky-note {
-  position: relative;
-  background: #FAF7EE;
-  padding: 18px 20px 14px 20px;
-  border: 1px solid rgba(22, 21, 15, 0.12);
-  box-shadow: 0 4px 10px rgba(22, 21, 15, 0.06);
-  border-radius: 2px;
-  max-width: 280px;
-}
-
-.otc-sticky-tilt-left {
-  transform: rotate(-1.5deg);
-}
-
-.otc-sticky-tilt-right {
-  transform: rotate(1.2deg);
-}
-
-.otc-sticky-text {
-  font-family: var(--font-handwriting);
-  font-size: 1.3rem;
-  color: var(--ink);
-  line-height: 1.25;
-  margin: 0;
-}
-
-/* --------------------------------------------------------------------------
-   8. Upgraded Interactive Sketchpad
-   -------------------------------------------------------------------------- */
-.otc-sketchpad-section {
-  padding-top: 1rem;
-}
-
-.otc-sketchpad-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.otc-sketchpad-title {
-  font-family: var(--font-serif);
-  font-size: 1.25rem;
-  font-weight: 500;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.otc-sketchpad-toolbar {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.otc-swatches-group {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding-right: 6px;
-  border-right: 1px solid var(--border-hairline);
-}
-
-.otc-color-pill {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  border: 2px solid transparent;
-  cursor: pointer;
-  transition: transform 0.15s ease, border-color 0.15s ease;
-}
-
-.otc-color-pill.is-active {
-  transform: scale(1.2);
-  border-color: var(--ink);
-}
-
-.otc-sizes-group {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  padding-right: 6px;
-  border-right: 1px solid var(--border-hairline);
-}
-
-.otc-size-btn {
-  padding: 0.35rem 0.65rem;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  border: 1px solid var(--border-medium);
-  background: transparent;
-  border-radius: 4px;
-  cursor: pointer;
-  color: var(--ink-muted);
-  min-height: 36px;
-}
-
-.otc-size-btn.is-active {
-  background: var(--ink);
-  color: #FFFFFF;
-  border-color: var(--ink);
-}
-
-.otc-stamps-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.otc-stamps-label {
-  font-family: var(--font-handwriting);
-  font-size: 1.15rem;
-  color: var(--ink-muted);
-}
-
-.otc-stamp-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 0.35rem 0.75rem;
-  background: #FFFFFF;
-  border: 1px dashed var(--border-medium);
-  border-radius: 4px;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--ink);
-  cursor: pointer;
-  transition: all 0.15s ease;
-  min-height: 34px;
-}
-
-.otc-stamp-btn:hover {
-  background: var(--bg-raised);
-  border-color: var(--ink);
-  transform: translateY(-1px);
-}
-
-.otc-canvas-wrap {
-  width: 100%;
-  height: 270px;
-  min-height: 260px;
-  background: #FAF8F3;
-  border: 1px solid var(--border-medium);
-  border-radius: 6px;
-  position: relative;
-  overflow: hidden;
-  box-shadow: inset 0 2px 6px rgba(22, 21, 15, 0.04);
-}
-
-.otc-drawing-canvas {
-  width: 100%;
-  height: 100%;
-  touch-action: none;
-  cursor: crosshair;
-  display: block;
-}
-
-.otc-canvas-hint {
-  position: absolute;
-  top: 14px;
-  left: 16px;
-  font-family: var(--font-handwriting);
-  font-size: 1.25rem;
-  color: var(--ink-faint);
-  pointer-events: none;
-  user-select: none;
-}
-
-/* --------------------------------------------------------------------------
-   9. Click Spark Effect (Section-scoped)
-   -------------------------------------------------------------------------- */
-.otc-spark-container {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: 50;
-}
-
-.otc-spark-dot {
-  position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
-  background: var(--ink);
-}
-
-/* --------------------------------------------------------------------------
-   10. Mobile Photo Booth Collection & Swipe Board (<= 768px)
+   5. Mobile Collection Pile & Swipe Board (<= 768px)
    -------------------------------------------------------------------------- */
 .otc-mobile-booth-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
-  margin: 0.5rem auto 1.5rem;
 }
 
-/* 1. Collapsed State: ONE compact collection card (70 to 80dvh max) */
 .otc-collection-stage {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 1rem 0.5rem;
-  min-height: 440px;
-  max-height: 78dvh;
+  width: 100%;
+  padding: 1.5rem 0 2rem;
 }
 
 .otc-pile-interactive-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   cursor: pointer;
   background: transparent;
   border: none;
-  padding: 1rem;
-  border-radius: 8px;
   outline: none;
-  user-select: none;
-  touch-action: manipulation;
-  transition: transform 0.2s var(--ease-editorial);
-}
-
-.otc-pile-interactive-btn:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 4px;
+  width: 100%;
+  max-width: 320px;
 }
 
 .otc-pile-card-stack {
   position: relative;
-  width: 250px;
-  height: 320px;
+  width: 260px;
+  height: 340px;
+  margin-bottom: 1.25rem;
 }
 
-/* 4 peeking cards underneath with soft layered shadows and angles */
 .otc-pile-under-card {
   position: absolute;
   inset: 0;
   background: #FFFFFF;
-  border: 1px solid var(--border-medium);
-  border-radius: 3px;
-  box-shadow: 0 8px 22px -3px rgba(22, 21, 15, 0.12);
-  pointer-events: none;
-  transition: transform 0.3s var(--ease-editorial);
+  border: 1px solid rgba(22, 21, 15, 0.09);
+  border-radius: 2px;
+  box-shadow: 0 4px 12px rgba(22, 21, 15, 0.06);
 }
 
 .otc-pile-top-card {
   position: absolute;
   inset: 0;
-  width: 100% !important;
-  box-shadow: 0 16px 36px -4px rgba(22, 21, 15, 0.18) !important;
-  cursor: pointer;
-  margin: 0;
+  height: 100%;
 }
 
 .otc-collection-label-group {
-  margin-top: 1.25rem;
   text-align: center;
 }
 
 .otc-collection-title {
   font-family: var(--font-handwriting);
-  font-size: 1.85rem;
+  font-size: 1.75rem;
   color: var(--ink);
-  margin: 0 0 0.2rem 0;
+  margin: 0;
   line-height: 1.2;
 }
 
 .otc-collection-caption {
   font-family: var(--font-mono);
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   color: var(--ink-muted);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  margin: 0;
+  margin: 4px 0 0;
+  letter-spacing: 0.04em;
 }
 
 .otc-collection-hint-row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
+  gap: 0.4rem;
   margin-top: 0.4rem;
 }
 
 .otc-collection-arrow-svg {
-  width: 38px;
+  width: 36px;
   height: 22px;
-  color: var(--ink-muted);
-  flex-shrink: 0;
 }
 
 .otc-collection-hint-text {
   font-family: var(--font-handwriting);
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   color: var(--ink-muted);
 }
 
-/* 2. Open Layout: Horizontal Swipe Board */
+/* Mobile Open Board */
 .otc-open-collection-view {
   width: 100%;
-  max-height: 98dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  overflow: hidden;
 }
 
 .otc-mobile-board-header {
   width: 100%;
-  max-width: 340px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.85rem;
+  gap: 1rem;
+  margin-bottom: 1rem;
   padding: 0 0.5rem;
-  margin-bottom: 0.65rem;
 }
 
 .otc-counter-chip {
   font-family: var(--font-mono);
-  font-size: 0.8125rem;
+  font-size: 0.78rem;
   font-weight: 600;
   color: var(--ink);
-  background: var(--bg-raised);
-  padding: 0.2rem 0.6rem;
-  border-radius: 12px;
-  border: 1px solid var(--border-hairline);
-  white-space: nowrap;
+  background: #FFFFFF;
+  border: 1px solid var(--border-medium);
+  padding: 0.35rem 0.65rem;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .otc-counter-sep {
   color: var(--ink-faint);
-  margin: 0 2px;
 }
 
 .otc-progress-track {
@@ -1151,25 +709,22 @@
 .otc-progress-bar {
   height: 100%;
   background: var(--ink);
-  border-radius: 2px;
-  transition: width 0.18s ease-out;
+  transition: width 0.25s ease;
 }
 
+/* Horizontal Swipe Board: touch-action: pan-y ensures vertical page scroll is never blocked */
 .otc-horizontal-swipe-board {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 16px;
-  width: 100%;
+  gap: 1rem;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
-  overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  padding: 0.75rem calc(14vw) 1.25rem;
   scrollbar-width: none;
-  -ms-overflow-style: none;
-  touch-action: pan-y pan-x;
-  padding: 8px calc((100vw - clamp(240px, 72vw, 300px)) / 2) 16px;
-  outline: none;
 }
 
 .otc-horizontal-swipe-board::-webkit-scrollbar {
@@ -1177,42 +732,46 @@
 }
 
 .otc-polaroid-mobile {
-  width: clamp(240px, 72vw, 300px);
+  width: 72vw;
+  max-width: 310px;
   flex-shrink: 0;
   scroll-snap-align: center;
-  cursor: pointer;
-  transition: box-shadow 0.25s ease, transform 0.25s var(--ease-editorial);
-  box-shadow: 0 8px 20px -3px rgba(22, 21, 15, 0.12);
+  transition: transform 0.25s ease;
 }
 
 .otc-polaroid-mobile.is-centered {
-  box-shadow: 0 16px 36px -4px rgba(22, 21, 15, 0.22);
+  box-shadow: 0 12px 28px -4px rgba(22, 21, 15, 0.16);
 }
 
-.otc-mobile-controls-row {
+.otc-contact-sheet-mobile {
+  width: 100%;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+/* Mobile Bottom Actions */
+.otc-mobile-action-bar {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-top: 0.5rem;
+  gap: 0.65rem;
+  margin-top: 1rem;
   width: 100%;
 }
 
 .otc-mobile-action-btn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 0.45rem 0.8rem;
-  min-height: 44px;
+  gap: 0.45rem;
+  padding: 0.5rem 0.85rem;
   background: #FFFFFF;
   border: 1px solid var(--border-medium);
   border-radius: 4px;
   font-family: var(--font-mono);
   font-size: 0.75rem;
   color: var(--ink);
+  min-height: 44px;
   cursor: pointer;
-  transition: all 0.15s ease;
 }
 
 .otc-mobile-action-btn.is-active {
@@ -1221,228 +780,583 @@
   border-color: var(--ink);
 }
 
-.otc-mobile-action-btn:active {
-  transform: scale(0.97);
+/* --------------------------------------------------------------------------
+   6. Lightbox (Solid dark backdrop, max-height 80dvh, no clipping)
+   -------------------------------------------------------------------------- */
+.otc-lightbox-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background-color: rgba(14, 13, 10, 0.95); /* Solid dark, no blur */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
 }
 
-/* Mini 4-Column Contact Sheet for Mobile */
-.otc-mobile-contact-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  width: 100%;
-  max-width: 320px;
-  padding: 0.5rem 0;
-  margin: 0 auto;
-}
-
-.otc-mobile-contact-thumb-btn {
+.otc-lightbox-dialog {
   position: relative;
-  aspect-ratio: 4 / 5;
-  border: 1px solid var(--border-medium);
-  border-radius: 3px;
-  overflow: hidden;
-  background: #FFFFFF;
-  padding: 0;
+  width: 100%;
+  max-width: 580px;
+  max-height: 85dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  outline: none;
+}
+
+.otc-lightbox-close {
+  position: absolute;
+  top: -46px;
+  right: 0;
+  background: transparent;
+  border: none;
+  color: #FFFFFF;
   cursor: pointer;
-  min-height: 44px;
-  transition: transform 0.15s ease, border-color 0.15s ease;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: opacity 0.2s ease;
 }
 
-.otc-mobile-contact-thumb-btn.is-active {
-  outline: 2px solid var(--ink);
-  outline-offset: 1px;
+.otc-lightbox-close:hover {
+  opacity: 0.8;
 }
 
-.otc-mobile-contact-img {
+.otc-lightbox-nav {
+  position: absolute;
+  top: 45%;
+  transform: translateY(-50%);
+  background: rgba(22, 21, 15, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 5;
+  transition: background 0.2s ease;
+}
+
+.otc-lightbox-nav:hover {
+  background: rgba(22, 21, 15, 0.95);
+}
+
+.otc-lightbox-prev {
+  left: -54px;
+}
+
+.otc-lightbox-next {
+  right: -54px;
+}
+
+@media (max-width: 720px) {
+  .otc-lightbox-prev {
+    left: 8px;
+  }
+  .otc-lightbox-next {
+    right: 8px;
+  }
+}
+
+.otc-lightbox-card {
+  background: #FFFFFF;
+  padding: 12px 12px 16px;
+  border-radius: 4px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+}
+
+.otc-lightbox-photo-wrap {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  max-height: 64dvh;
+  overflow: hidden;
+  background: var(--bg-raised);
+}
+
+.otc-lightbox-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-.otc-mobile-contact-num {
-  position: absolute;
-  bottom: 2px;
-  right: 3px;
+.otc-lightbox-footer {
+  margin-top: 10px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.otc-lightbox-caption {
+  font-family: var(--font-handwriting);
+  font-size: 1.4rem;
+  color: var(--ink);
+  margin: 0 0 3px;
+  line-height: 1.25;
+}
+
+.otc-lightbox-tag {
   font-family: var(--font-mono);
-  font-size: 0.625rem;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  letter-spacing: 0.05em;
+}
+
+.otc-lightbox-counter {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
   font-weight: 600;
-  color: #FFFFFF;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
-  background: rgba(22, 21, 15, 0.5);
-  padding: 1px 3px;
-  border-radius: 2px;
+  color: var(--ink-muted);
+  white-space: nowrap;
+  padding-top: 4px;
 }
 
-/* --------------------------------------------------------------------------
-   11. Shorter Doodle Corner on Mobile (<= 640px)
-   -------------------------------------------------------------------------- */
+/* Thumbnail strip */
+.otc-lightbox-thumbs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  margin-top: 14px;
+  padding: 4px 0;
+  max-width: 100%;
+}
+
 @media (max-width: 640px) {
-  .otc-doodle-corner {
-    padding: 1.25rem 0.85rem;
-    box-shadow: 0 2px 10px -2px rgba(22, 21, 15, 0.04);
-  }
-
-  /* Ruled lines tightened to 24px to match text and compact height by ~40% */
-  .otc-notebook-ruled {
-    background-size: 100% 24px;
-  }
-
-  .otc-doodle-head {
-    margin-bottom: 1.15rem;
-  }
-
-  .otc-doodle-title {
-    font-size: 1.75rem;
-    line-height: 1.15;
-    margin-bottom: 0.25rem;
-  }
-
-  .otc-doodle-subtitle {
-    font-size: 0.8125rem;
-    line-height: 1.35;
-  }
-
-  /* 3 rows of 2 doodles with row gap 22-24px */
-  .otc-doodles-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 22px 12px;
-    margin-bottom: 1.25rem;
-  }
-
-  .otc-doodle-card {
-    padding: 0.25rem;
-  }
-
-  /* Doodle SVG tightened to 76px (within 72 to 84px) */
-  .otc-doodle-svg {
-    width: 76px;
-    height: 76px;
-  }
-
-  /* Labels max 2 lines, no clipping */
-  .otc-doodle-label {
-    font-size: 1.05rem;
-    line-height: 1.15;
-    margin-top: 0.25rem;
-    max-width: 135px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  /* Hide emoji on mobile to prevent clutter and wrapping */
-  .otc-doodle-emoji {
-    display: none !important;
-  }
-
-  /* Hide the 2 requested doodles on mobile (keeps 6 doodles) */
-  .otc-doodle-hide-mobile {
-    display: none !important;
-  }
-
-  .otc-sticky-row {
-    margin: 1.15rem 0;
-    gap: 0.85rem;
-    padding-bottom: 1rem;
-  }
-
-  .otc-sticky-note {
-    padding: 12px 14px 10px;
-    max-width: 100%;
-  }
-
-  .otc-sticky-text {
-    font-size: 1.1rem;
-  }
-
-  .otc-sketchpad-section {
-    padding-top: 0.75rem;
-  }
-
-  .otc-sketchpad-header {
-    margin-bottom: 0.75rem;
-  }
-
-  .otc-sketchpad-toolbar {
-    width: 100%;
-    justify-content: flex-start;
-    gap: 0.5rem;
-  }
-
-  /* 44px minimum tap targets on mobile */
-  .otc-swatches-group {
-    min-height: 44px;
-    gap: 8px;
-  }
-
-  .otc-color-pill {
-    width: 28px;
-    height: 28px;
-  }
-
-  .otc-size-btn {
-    min-height: 44px;
-    min-width: 44px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.8125rem;
-  }
-
-  .otc-icon-btn {
-    min-height: 44px;
-    min-width: 44px;
-    padding: 0.5rem 0.75rem;
-  }
-
-  .otc-stamp-btn {
-    min-height: 44px;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.8125rem;
-  }
-
-  /* Full width sketchpad with min-height 260px */
-  .otc-canvas-wrap {
-    width: 100%;
-    height: 260px;
-    min-height: 260px;
+  .otc-lightbox-thumbs {
+    display: none;
   }
 }
 
+.otc-lightbox-thumb-btn {
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: 3px;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  width: 38px;
+  height: 48px;
+  overflow: hidden;
+  opacity: 0.6;
+  transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+
+.otc-lightbox-thumb-btn.is-active {
+  opacity: 1;
+  border-color: var(--accent);
+}
+
+.otc-lightbox-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 /* --------------------------------------------------------------------------
-   12. Small Screen Adjustments (< 430px)
+   7. Section Divider
    -------------------------------------------------------------------------- */
-@media (max-width: 430px) {
-  .otc-polaroid {
-    padding: 8px 8px 10px 8px;
-  }
-  .otc-polaroid-caption {
-    font-size: 1.05rem; /* ~16.8px, strictly >= 15px */
-    min-height: 2.4em;
-    line-height: 1.2;
-    margin-bottom: 4px;
-  }
-  .otc-polaroid-footer {
-    min-height: 64px;
-    height: auto;
-  }
+.otc-section-divider {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: clamp(3rem, 5vw, 4.5rem) 0;
+}
+
+.otc-divider-svg {
+  width: 100%;
+  max-width: 500px;
+  height: 12px;
 }
 
 /* --------------------------------------------------------------------------
-   11. Reduced Motion Accessibility
+   8. Doodle Corner + Sketchpad: ONE Open Notebook Spread
+   -------------------------------------------------------------------------- */
+.otc-notebook-spread {
+  position: relative;
+  background-color: #FAF7EE;
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 27px,
+    rgba(22, 21, 15, 0.035) 28px
+  );
+  border: 1px solid rgba(22, 21, 15, 0.14);
+  border-radius: 12px;
+  box-shadow: 0 16px 36px -8px rgba(22, 21, 15, 0.1), 0 2px 6px rgba(22, 21, 15, 0.04);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 900px) {
+  .otc-notebook-spread {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+  }
+}
+
+/* Corner washi tape on notebook spread */
+.otc-notebook-tape {
+  position: absolute;
+  top: -8px;
+  width: 64px;
+  height: 18px;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0.88;
+}
+
+.otc-notebook-tape-tl {
+  left: 20px;
+  transform: rotate(-10deg);
+  background: rgba(198, 242, 78, 0.85);
+  border-left: 2px dashed rgba(22, 21, 15, 0.12);
+  border-right: 2px dashed rgba(22, 21, 15, 0.12);
+}
+
+.otc-notebook-tape-tr {
+  right: 20px;
+  transform: rotate(8deg);
+  background: rgba(239, 235, 225, 0.95);
+  border-left: 2px dashed rgba(22, 21, 15, 0.12);
+  border-right: 2px dashed rgba(22, 21, 15, 0.12);
+}
+
+/* Center spine shadow (visible on two-page desktop spread) */
+.otc-notebook-spine {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .otc-notebook-spine {
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 28px;
+    transform: translateX(-50%);
+    pointer-events: none;
+    z-index: 3;
+    background: linear-gradient(
+      to right,
+      rgba(22, 21, 15, 0.03) 0%,
+      rgba(22, 21, 15, 0.08) 50%,
+      rgba(22, 21, 15, 0.03) 100%
+    );
+  }
+}
+
+/* Notebook Pages */
+.otc-notebook-page {
+  padding: 2rem 1.75rem 2.25rem;
+  box-sizing: border-box;
+}
+
+.otc-notebook-page-left {
+  border-bottom: 1px dashed var(--border-medium);
+}
+
+@media (min-width: 900px) {
+  .otc-notebook-page-left {
+    border-bottom: none;
+    border-right: 1px dashed rgba(22, 21, 15, 0.12);
+    padding: 2.25rem 2.25rem 2.5rem;
+  }
+}
+
+.otc-notebook-page-right {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 900px) {
+  .otc-notebook-page-right {
+    padding: 2.25rem 2.25rem 2.5rem;
+    height: 100%;
+  }
+}
+
+/* Left Page: Doodle Header & Sticky Note */
+.otc-doodle-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.otc-doodle-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.4rem, 2vw, 1.75rem);
+  font-weight: 400;
+  color: var(--ink);
+  margin: 0;
+  line-height: 1.25;
+}
+
+.otc-sticky-washi-note {
+  font-family: var(--font-handwriting);
+  font-size: 1.05rem;
+  color: var(--ink);
+  background: rgba(198, 242, 78, 0.55);
+  border-left: 3px solid var(--accent-ink);
+  padding: 0.35rem 0.65rem;
+  border-radius: 2px;
+  transform: rotate(-1.5deg);
+  white-space: nowrap;
+}
+
+/* 8 Doodles in a Clean 2-Column Grid */
+.otc-doodles-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem 1.25rem;
+}
+
+.otc-doodle-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0.65rem 0.5rem;
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(22, 21, 15, 0.06);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.otc-doodle-card:hover {
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 4px 12px rgba(22, 21, 15, 0.06);
+}
+
+.otc-doodle-svg-wrap {
+  width: 88px;
+  height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.otc-doodle-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.otc-doodle-label {
+  font-family: var(--font-handwriting);
+  font-size: 1.15rem;
+  color: var(--ink);
+  line-height: 1.15;
+  margin-top: 0.35rem;
+  max-width: 140px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-align: center;
+}
+
+/* Mobile: hide 2 flagged doodles ("send help" and "page not found, me neither") */
+@media (max-width: 640px) {
+  .otc-doodle-hide-mobile {
+    display: none;
+  }
+}
+
+/* Right Page: Interactive Sketchpad */
+.otc-sketchpad-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.otc-sketchpad-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.otc-sketchpad-title {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.otc-sketchpad-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Color Swatches */
+.otc-swatches-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 3px 5px;
+  background: rgba(22, 21, 15, 0.04);
+  border-radius: 20px;
+}
+
+.otc-color-pill {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  min-height: 22px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.otc-color-pill:hover {
+  transform: scale(1.12);
+}
+
+.otc-color-pill.is-active {
+  border-color: #FFFFFF;
+  box-shadow: 0 0 0 2px var(--ink);
+}
+
+/* Brush Sizes */
+.otc-sizes-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: rgba(22, 21, 15, 0.04);
+  border-radius: 4px;
+  padding: 2px;
+}
+
+.otc-size-btn {
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--ink-muted);
+  cursor: pointer;
+  padding: 0.35rem 0.55rem;
+  min-height: 32px;
+  transition: all 0.15s ease;
+}
+
+.otc-size-btn.is-active {
+  background: #FFFFFF;
+  color: var(--ink);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(22, 21, 15, 0.08);
+}
+
+/* Stamps Bar */
+.otc-stamps-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.otc-stamps-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  margin-right: 2px;
+}
+
+.otc-stamp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 0.35rem 0.65rem;
+  background: #FFFFFF;
+  border: 1px dashed var(--border-medium);
+  border-radius: 4px;
+  color: var(--ink);
+  cursor: pointer;
+  min-height: 36px;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.otc-stamp-btn:hover {
+  background: var(--bg-raised);
+  border-color: var(--ink);
+}
+
+/* Canvas Wrapper: stretches to equal height of left page on desktop */
+.otc-canvas-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 280px;
+  width: 100%;
+}
+
+.otc-canvas-hint {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  pointer-events: none;
+  font-family: var(--font-handwriting);
+  font-size: 1.25rem;
+  color: var(--ink-faint);
+  user-select: none;
+  z-index: 1;
+}
+
+/* Canvas: touch-action: none is strictly applied ONLY to canvas */
+.otc-drawing-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+  background: #FAF7EE;
+  border: 1px dashed rgba(22, 21, 15, 0.18);
+  border-radius: 6px;
+  cursor: crosshair;
+}
+
+/* --------------------------------------------------------------------------
+   9. Reduced Motion Overrides
    -------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
-  .otc-doodle-card:hover {
+  .otc-polaroid-card,
+  .otc-doodle-card,
+  .otc-icon-btn,
+  .otc-toggle-btn {
     transform: none !important;
-  }
-  .otc-polaroid {
+    animation: none !important;
     transition: none !important;
   }
-  .otc-title-swoosh path {
-    transition: none !important;
+
+  .otc-polaroid-card:hover {
+    transform: none !important;
   }
 }

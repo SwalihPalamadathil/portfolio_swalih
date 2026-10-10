@@ -1,30 +1,26 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Shuffle, Grid, Image as ImageIcon, Sparkles, ZoomIn, Layers } from 'lucide-react';
-import { photos as allPhotos, photoCollectionConfig } from '../../data/offTheClock';
+import { Shuffle, RotateCcw, Grid, Image as ImageIcon, ZoomIn, Layers } from 'lucide-react';
+import { photos as rawPhotos, photoCollectionConfig } from '../../data/offTheClock';
 import Lightbox from './Lightbox';
 
-/**
- * Mobile breakpoint single constant (widths <= 768px use mobile collection)
- */
 export const MOBILE_BREAKPOINT = 768;
 
-// Tunable constants
-const SPRING_HOVER = { type: 'spring', stiffness: 350, damping: 25 };
-const DEVELOP_DURATION = 0.55;
-const ROTATION_RANGE = 3.6;
+const INITIAL_PHOTOS = rawPhotos.map((p, idx) => ({
+  ...p,
+  frameNum: String(idx + 1).padStart(2, '0')
+}));
 
-// Underneath cards for the collapsed pile aesthetic
+// Underneath cards for the collapsed pile aesthetic on mobile
 const UNDERNEATH_CARDS = [
-  { rot: -7.5, x: -14, y: 8, zIndex: 1 },
-  { rot: 6.8, x: 12, y: -6, zIndex: 2 },
-  { rot: -4.2, x: -8, y: 5, zIndex: 3 },
-  { rot: 4.8, x: 10, y: 4, zIndex: 4 }
+  { rot: -6.5, x: -12, y: 7, zIndex: 1 },
+  { rot: 5.8, x: 10, y: -5, zIndex: 2 },
+  { rot: -3.8, x: -7, y: 4, zIndex: 3 },
+  { rot: 4.2, x: 8, y: 3, zIndex: 4 }
 ];
 
 export default function PhotoBooth() {
   const shouldReduceMotion = useReducedMotion();
-  const boardRef = useRef(null);
   const swipeRef = useRef(null);
   const activeTriggerRef = useRef(null);
   const scrollRafRef = useRef(null);
@@ -45,44 +41,35 @@ export default function PhotoBooth() {
     () => false
   );
 
-  const [isTouchDevice] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return (
-      'ontouchstart' in window ||
-      navigator.maxTouchPoints > 0 ||
-      window.matchMedia('(pointer: coarse)').matches
-    );
-  });
-
-  const [photosList, setPhotosList] = useState(allPhotos);
-  const [viewMode, setViewMode] = useState('polaroid'); // 'polaroid' | 'contact' (desktop)
+  const [photosList, setPhotosList] = useState(INITIAL_PHOTOS);
+  const [isShuffled, setIsShuffled] = useState(false);
+  const [viewMode, setViewMode] = useState('wall'); // 'wall' | 'contact'
   const [activePhotoIndex, setActivePhotoIndex] = useState(null);
-  const topZIndexRef = useRef(10);
-  const [cardZIndices, setCardZIndices] = useState({});
 
   // Mobile Collection states
   const [isCollectionOpen, setIsCollectionOpen] = useState(false);
   const [mobileViewMode, setMobileViewMode] = useState('swipe'); // 'swipe' | 'contact'
   const [activeCenterIndex, setActiveCenterIndex] = useState(0);
-  const [announcement, setAnnouncement] = useState('');
 
   const coverIndex = photoCollectionConfig?.coverIndex ?? 0;
   const coverPhoto = photosList[coverIndex] || photosList[0];
 
-  // Shuffle card rotations smoothly
+  // Shuffle card order with smooth layout transition in the strict grid
   const handleShuffle = () => {
-    setPhotosList((prev) =>
-      prev.map((p) => ({
-        ...p,
-        rotation: (Math.random() * (ROTATION_RANGE * 2) - ROTATION_RANGE).toFixed(1)
-      }))
-    );
+    setPhotosList((prev) => {
+      const copy = [...prev];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    });
+    setIsShuffled(true);
   };
 
-  const handleCardDragStart = (id) => {
-    topZIndexRef.current += 1;
-    const nextZ = topZIndexRef.current;
-    setCardZIndices((indices) => ({ ...indices, [id]: nextZ }));
+  const handleResetOrder = () => {
+    setPhotosList(INITIAL_PHOTOS);
+    setIsShuffled(false);
   };
 
   const openLightbox = (index, event) => {
@@ -161,41 +148,37 @@ export default function PhotoBooth() {
 
   const openCollection = () => {
     setIsCollectionOpen(true);
-    setAnnouncement(`Collection opened, ${photosList.length} photos`);
+    setMobileViewMode('swipe');
+    setActiveCenterIndex(coverIndex);
     setTimeout(() => {
       scrollToCard(coverIndex);
-    }, 120);
+    }, 60);
   };
 
   const collapseCollection = () => {
     setIsCollectionOpen(false);
-    setMobileViewMode('swipe');
-    setAnnouncement('Collection closed');
   };
 
-  // Keyboard navigation on mobile open board
+  // Keyboard navigation for swipe board
   useEffect(() => {
     if (!isMobile || !isCollectionOpen) return;
+
     const handleKeyDown = (e) => {
-      if (activePhotoIndex !== null) return; // Lightbox manages its own keys
-      if (e.key === 'Escape') {
+      if (e.key === 'ArrowRight') {
         e.preventDefault();
-        collapseCollection();
-      } else if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        const next = Math.min(photosList.length - 1, activeCenterIndex + 1);
+        const next = Math.min(activeCenterIndex + 1, photosList.length - 1);
         scrollToCard(next);
       } else if (e.key === 'ArrowLeft') {
         e.preventDefault();
-        const prev = Math.max(0, activeCenterIndex - 1);
+        const prev = Math.max(activeCenterIndex - 1, 0);
         scrollToCard(prev);
       }
     };
+
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isMobile, isCollectionOpen, activePhotoIndex, activeCenterIndex, photosList.length, scrollToCard]);
+  }, [isMobile, isCollectionOpen, activeCenterIndex, photosList.length, scrollToCard]);
 
-  // Clean up RAF on unmount
   useEffect(() => {
     return () => {
       if (scrollRafRef.current) {
@@ -206,11 +189,6 @@ export default function PhotoBooth() {
 
   return (
     <div className="otc-photobooth" aria-label="Photo Booth Gallery">
-      {/* Live announcement region for screen readers */}
-      <div className="sr-only" aria-live="polite" aria-atomic="true">
-        {announcement}
-      </div>
-
       {/* =========================================================================
           MOBILE VIEW (<= 768px): Compact Collection Pile & Swipe Board
           ========================================================================= */}
@@ -218,7 +196,7 @@ export default function PhotoBooth() {
         <div className="otc-mobile-booth-wrapper">
           <AnimatePresence mode="wait">
             {!isCollectionOpen ? (
-              /* 1. COLLAPSED STATE (DEFAULT): ONE compact collection card (70-80dvh max) */
+              /* 1. COLLAPSED STATE (DEFAULT): ONE compact collection card */
               <motion.div
                 key="collapsed-pile"
                 className="otc-collection-stage"
@@ -256,7 +234,7 @@ export default function PhotoBooth() {
                   whileTap={shouldReduceMotion ? {} : { scale: 0.97 }}
                 >
                   <div className="otc-pile-card-stack" aria-hidden="true">
-                    {/* 4 Cards peeking underneath with small offsets and soft layered shadows */}
+                    {/* Cards peeking underneath */}
                     {UNDERNEATH_CARDS.map((item, idx) => (
                       <div
                         key={`peeking-card-${idx}`}
@@ -269,16 +247,16 @@ export default function PhotoBooth() {
                     ))}
 
                     {/* Top Polaroid Cover Card */}
-                    <motion.div
-                      layoutId={`otc-photo-${coverPhoto.id}`}
-                      className="otc-polaroid otc-pile-top-card"
+                    <div
+                      className="otc-polaroid-card otc-pile-top-card"
                       style={{ zIndex: 10 }}
                     >
-                      {/* One tape strip in lime or kraft */}
-                      <div
-                        className={`otc-tape ${coverPhoto.tape === 'kraft' ? 'otc-tape-kraft' : 'otc-tape-lime'}`}
-                        aria-hidden="true"
-                      />
+                      {coverPhoto.tape && coverPhoto.tape !== 'none' && (
+                        <div
+                          className={`otc-tape otc-tape-${coverPhoto.tape}`}
+                          aria-hidden="true"
+                        />
+                      )}
 
                       <div className="otc-polaroid-photo-frame">
                         <img
@@ -300,13 +278,13 @@ export default function PhotoBooth() {
                         </p>
                         <div className="otc-polaroid-meta">
                           <span className="otc-polaroid-tag">{coverPhoto.tag}</span>
-                          <span className="otc-polaroid-num">01</span>
+                          <span className="otc-polaroid-num">{coverPhoto.frameNum}</span>
                         </div>
                       </div>
-                    </motion.div>
+                    </div>
                   </div>
 
-                  {/* Handwritten label and mono caption under the pile */}
+                  {/* Labels under the pile */}
                   <div className="otc-collection-label-group">
                     <h3 className="otc-collection-title">My little collection</h3>
                     <p className="otc-collection-caption">
@@ -314,7 +292,7 @@ export default function PhotoBooth() {
                     </p>
                   </div>
 
-                  {/* Hand-drawn arrow doodle with hint */}
+                  {/* Hand-drawn arrow doodle hint */}
                   <div className="otc-collection-hint-row">
                     <svg
                       className="otc-collection-arrow-svg"
@@ -342,7 +320,7 @@ export default function PhotoBooth() {
                 </motion.div>
               </motion.div>
             ) : (
-              /* 2. SCATTERED ANIMATION & OPEN BOARD (Under 100dvh) */
+              /* 2. OPEN MOBILE BOARD: Horizontal Swipe or Compact Grid */
               <motion.div
                 key="open-collection"
                 className="otc-open-collection-view"
@@ -351,7 +329,7 @@ export default function PhotoBooth() {
                 exit={{ opacity: 0 }}
                 transition={{ duration: shouldReduceMotion ? 0.05 : 0.25 }}
               >
-                {/* Header bar: Counter chip and progress line */}
+                {/* Header bar: Counter chip and progress bar */}
                 <div className="otc-mobile-board-header">
                   <div className="otc-counter-chip" aria-label={`Photo ${activeCenterIndex + 1} of ${photosList.length}`}>
                     <span>{String(activeCenterIndex + 1).padStart(2, '0')}</span>
@@ -370,7 +348,7 @@ export default function PhotoBooth() {
                 </div>
 
                 {mobileViewMode === 'swipe' ? (
-                  /* Horizontal Swipe Board: scroll-snap-x mandatory, hidden scrollbar, peek neighbors */
+                  /* Horizontal Swipe Board: touch-action: pan-y preserves vertical page scroll */
                   <div
                     ref={swipeRef}
                     className="otc-horizontal-swipe-board"
@@ -380,14 +358,12 @@ export default function PhotoBooth() {
                   >
                     {photosList.map((photo, index) => {
                       const isActive = index === activeCenterIndex;
-                      const formattedNumber = String(index + 1).padStart(2, '0');
                       const cardTilt = shouldReduceMotion ? 0 : (isActive ? 0 : Number(photo.rotation) || 0);
 
                       return (
-                        <motion.div
+                        <motion.figure
                           key={photo.id}
-                          layoutId={`otc-photo-${photo.id}`}
-                          className={`otc-polaroid otc-polaroid-mobile ${isActive ? 'is-centered' : ''}`}
+                          className={`otc-polaroid-card otc-polaroid-mobile ${isActive ? 'is-centered' : ''}`}
                           initial={{ opacity: 0, y: 16 }}
                           animate={{
                             opacity: 1,
@@ -416,25 +392,17 @@ export default function PhotoBooth() {
                               openLightbox(index, e);
                             }
                           }}
-                          aria-label={`Photo ${formattedNumber}: ${photo.caption}. ${isActive ? 'Tap to view full size.' : 'Tap to center.'}`}
+                          aria-label={`Photo ${photo.frameNum}: ${photo.caption}. ${isActive ? 'Tap to view full size.' : 'Tap to center.'}`}
                         >
-                          {/* Tape strip */}
-                          {photo.tape === 'lime' && (
-                            <div className="otc-tape otc-tape-lime" aria-hidden="true" />
-                          )}
-                          {photo.tape === 'cream' && (
-                            <div className="otc-tape otc-tape-cream" aria-hidden="true" />
-                          )}
-                          {photo.tape === 'kraft' && (
-                            <div className="otc-tape otc-tape-kraft" aria-hidden="true" />
+                          {photo.tape && photo.tape !== 'none' && (
+                            <div className={`otc-tape otc-tape-${photo.tape}`} aria-hidden="true" />
                           )}
 
-                          {/* 4:5 Aspect Ratio Photo Container */}
                           <div className="otc-polaroid-photo-frame">
                             <img
                               src={photo.src}
                               alt={photo.alt}
-                              loading={index < 3 ? 'eager' : 'lazy'}
+                              loading={index < 4 ? 'eager' : 'lazy'}
                               decoding="async"
                               className="otc-polaroid-img"
                               style={{ objectPosition: photo.objectPosition || 'center center' }}
@@ -446,57 +414,57 @@ export default function PhotoBooth() {
                             )}
                           </div>
 
-                          {/* Fixed-Height Polaroid Caption Area (Never clips or overlaps) */}
-                          <div className="otc-polaroid-footer">
+                          <figcaption className="otc-polaroid-footer">
                             <p className="otc-polaroid-caption" title={photo.caption}>
                               {photo.caption}
                             </p>
                             <div className="otc-polaroid-meta">
                               <span className="otc-polaroid-tag">{photo.tag}</span>
-                              <span className="otc-polaroid-num">{formattedNumber}</span>
+                              <span className="otc-polaroid-num">{photo.frameNum}</span>
                             </div>
-                          </div>
-                        </motion.div>
+                          </figcaption>
+                        </motion.figure>
                       );
                     })}
                   </div>
                 ) : (
-                  /* Mini 4-Column Contact Sheet for quick jumping (about 3-4 rows only) */
-                  <div className="otc-mobile-contact-grid" role="grid" aria-label="Thumbnail grid for photo selection">
-                    {photosList.map((photo, index) => {
-                      const formattedNumber = String(index + 1).padStart(2, '0');
-                      const isSelected = index === activeCenterIndex;
-
-                      return (
-                        <button
-                          key={`mobile-contact-${photo.id}`}
-                          type="button"
-                          className={`otc-mobile-contact-thumb-btn ${isSelected ? 'is-active' : ''}`}
-                          onClick={() => {
-                            setMobileViewMode('swipe');
-                            setTimeout(() => {
-                              scrollToCard(index);
-                            }, 50);
-                          }}
-                          aria-label={`Jump to photo ${formattedNumber}: ${photo.caption}`}
-                        >
-                          <img
-                            src={photo.src}
-                            alt=""
-                            loading="lazy"
-                            decoding="async"
-                            className="otc-mobile-contact-img"
-                            style={{ objectPosition: photo.objectPosition || 'center center' }}
-                          />
-                          <span className="otc-mobile-contact-num">{formattedNumber}</span>
-                        </button>
-                      );
-                    })}
+                  /* Mobile Contact Sheet overview */
+                  <div className="otc-contact-sheet otc-contact-sheet-mobile">
+                    {photosList.map((photo, index) => (
+                      <div
+                        key={`m-contact-${photo.id}`}
+                        className="otc-contact-frame"
+                        onClick={(e) => openLightbox(index, e)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            openLightbox(index, e);
+                          }
+                        }}
+                        aria-label={`View photo ${photo.frameNum}: ${photo.caption}`}
+                      >
+                        <div className="otc-contact-header">
+                          <span className="otc-contact-num">🎞️ {photo.frameNum}</span>
+                          <span className="otc-contact-tag-badge">{photo.tag}</span>
+                        </div>
+                        <img
+                          src={photo.src}
+                          alt={photo.alt}
+                          loading={index < 4 ? 'eager' : 'lazy'}
+                          decoding="async"
+                          className="otc-contact-thumb"
+                          style={{ objectPosition: photo.objectPosition || 'center center' }}
+                        />
+                        <div className="otc-contact-caption">{photo.caption}</div>
+                      </div>
+                    ))}
                   </div>
                 )}
 
-                {/* Mobile Controls Row: Stack back, Shuffle, Contact sheet */}
-                <div className="otc-mobile-controls-row">
+                {/* Mobile Bottom Action Bar */}
+                <div className="otc-mobile-action-bar">
                   <button
                     type="button"
                     className="otc-mobile-action-btn"
@@ -511,7 +479,7 @@ export default function PhotoBooth() {
                     type="button"
                     className="otc-mobile-action-btn"
                     onClick={handleShuffle}
-                    aria-label="Shuffle photo tilts"
+                    aria-label="Shuffle photos order"
                   >
                     <Shuffle size={14} aria-hidden="true" />
                     <span>Shuffle</span>
@@ -521,7 +489,7 @@ export default function PhotoBooth() {
                     type="button"
                     className={`otc-mobile-action-btn ${mobileViewMode === 'contact' ? 'is-active' : ''}`}
                     onClick={() => setMobileViewMode((m) => (m === 'swipe' ? 'contact' : 'swipe'))}
-                    aria-label={mobileViewMode === 'contact' ? 'Switch back to swipe board' : 'Open contact sheet overview'}
+                    aria-label={mobileViewMode === 'contact' ? 'Switch to swipe view' : 'Open contact sheet overview'}
                   >
                     {mobileViewMode === 'contact' ? (
                       <>
@@ -542,42 +510,53 @@ export default function PhotoBooth() {
         </div>
       ) : (
         /* =========================================================================
-            DESKTOP / TABLET-LANDSCAPE VIEW (> 768px): Scattered Board (Unchanged)
+            DESKTOP & LAPTOP VIEW (> 768px): "THE WALL"
+            Strict CSS Grid, Protected Outer Cells, Zero Overlap Guaranteed
             ========================================================================= */
-        <>
+        <div className="otc-wall-desktop-container">
+          {/* Controls Toolbar */}
           <div className="otc-booth-toolbar">
-            {!isTouchDevice ? (
-              <div className="otc-toolbar-hint">
-                <Sparkles size={15} color="var(--ink-muted)" aria-hidden="true" />
-                <span>psst, you can drag the photos around</span>
-              </div>
-            ) : (
-              <div className="otc-toolbar-hint">
-                <span>Tap any photo to view full size</span>
-              </div>
-            )}
+            <div className="otc-toolbar-hint">
+              <span>A curated wall of polaroids. Tap any frame to enlarge.</span>
+            </div>
 
             <div className="otc-toolbar-actions">
+              {/* Shuffle button */}
               <button
                 type="button"
                 className="otc-icon-btn"
                 onClick={handleShuffle}
-                title="Re-shuffle photo angles"
-                aria-label="Shuffle photo tilts"
+                title="Shuffle photo order"
+                aria-label="Shuffle photo order"
               >
                 <Shuffle size={14} aria-hidden="true" />
                 <span>Shuffle</span>
               </button>
 
-              <div className="otc-view-toggle" role="group" aria-label="Layout mode">
+              {/* Reset order button (visible after shuffle) */}
+              {isShuffled && (
                 <button
                   type="button"
-                  className={`otc-toggle-btn ${viewMode === 'polaroid' ? 'is-active' : ''}`}
-                  onClick={() => setViewMode('polaroid')}
-                  aria-pressed={viewMode === 'polaroid'}
+                  className="otc-icon-btn otc-btn-reset-order"
+                  onClick={handleResetOrder}
+                  title="Reset to original chronological order"
+                  aria-label="Reset photo order"
                 >
-                  <ImageIcon size={13} style={{ marginRight: 4, verticalAlign: 'middle' }} />
-                  Polaroids
+                  <RotateCcw size={14} aria-hidden="true" />
+                  <span>Reset order</span>
+                </button>
+              )}
+
+              {/* View Toggle */}
+              <div className="otc-view-toggle" role="group" aria-label="Layout view mode">
+                <button
+                  type="button"
+                  className={`otc-toggle-btn ${viewMode === 'wall' ? 'is-active' : ''}`}
+                  onClick={() => setViewMode('wall')}
+                  aria-pressed={viewMode === 'wall'}
+                >
+                  <ImageIcon size={13} style={{ marginRight: 5, verticalAlign: 'middle' }} />
+                  Wall
                 </button>
                 <button
                   type="button"
@@ -585,164 +564,149 @@ export default function PhotoBooth() {
                   onClick={() => setViewMode('contact')}
                   aria-pressed={viewMode === 'contact'}
                 >
-                  <Grid size={13} style={{ marginRight: 4, verticalAlign: 'middle' }} />
-                  Contact Sheet
+                  <Grid size={13} style={{ marginRight: 5, verticalAlign: 'middle' }} />
+                  Contact sheet
                 </button>
               </div>
             </div>
           </div>
 
-          <div ref={boardRef} className="otc-board otc-board-pinned">
-            {viewMode === 'polaroid' ? (
-              <motion.div layout className="otc-scatter-grid">
+          {/* Desk Surface / Dotted Grid */}
+          <div className="otc-wall-surface">
+            {viewMode === 'wall' ? (
+              <motion.div layout className="otc-wall-grid">
                 {photosList.map((photo, index) => {
-                  const currentZ = cardZIndices[photo.id] || 1;
-                  const cardRotation = shouldReduceMotion ? 0 : Number(photo.rotation) || 0;
-                  const formattedNumber = String(index + 1).padStart(2, '0');
+                  const cardTilt = shouldReduceMotion ? 0 : Number(photo.rotation) || 0;
 
                   return (
                     <motion.div
                       key={photo.id}
                       layout
-                      drag={!shouldReduceMotion && !isTouchDevice}
-                      dragConstraints={boardRef}
-                      dragElastic={0.08}
-                      onDragStart={() => handleCardDragStart(photo.id)}
-                      style={{ zIndex: currentZ }}
+                      className="otc-wall-cell"
                       initial={{
                         opacity: 0,
                         y: shouldReduceMotion ? 0 : 16,
                         filter: shouldReduceMotion
                           ? 'none'
-                          : 'grayscale(35%) sepia(20%) blur(1px)'
+                          : 'grayscale(35%) sepia(20%) blur(2px)'
                       }}
                       whileInView={{
                         opacity: 1,
                         y: 0,
                         filter: 'grayscale(0%) sepia(0%) blur(0px)'
                       }}
-                      viewport={{ once: true, margin: '-30px' }}
+                      viewport={{ once: true, margin: '-20px' }}
                       transition={{
-                        duration: shouldReduceMotion ? 0.05 : DEVELOP_DURATION,
+                        duration: shouldReduceMotion ? 0.05 : 0.55,
                         delay: shouldReduceMotion ? 0 : (index % 4) * 0.06,
                         ease: [0.22, 1, 0.36, 1]
                       }}
-                      whileHover={
-                        shouldReduceMotion
-                          ? {}
-                          : {
-                              rotate: 0,
-                              y: -6,
-                              scale: 1.02,
-                              transition: SPRING_HOVER
-                            }
-                      }
-                      whileDrag={{
-                        scale: 1.05,
-                        cursor: 'grabbing',
-                        boxShadow: '0 20px 35px -8px rgba(22, 21, 15, 0.28)'
-                      }}
-                      animate={{
-                        rotate: cardRotation
-                      }}
-                      className="otc-polaroid"
-                      onClick={(e) => openLightbox(index, e)}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          openLightbox(index, e);
-                        }
-                      }}
-                      aria-label={`Open photo ${formattedNumber}: ${photo.caption}`}
                     >
-                      {photo.tape === 'lime' && (
-                        <div className="otc-tape otc-tape-lime" aria-hidden="true" />
-                      )}
-                      {photo.tape === 'cream' && (
-                        <div className="otc-tape otc-tape-cream" aria-hidden="true" />
-                      )}
-                      {photo.tape === 'kraft' && (
-                        <div className="otc-tape otc-tape-kraft" aria-hidden="true" />
-                      )}
+                      <motion.figure
+                        className="otc-polaroid-card"
+                        style={{ rotate: cardTilt }}
+                        whileHover={
+                          shouldReduceMotion
+                            ? {}
+                            : {
+                                rotate: 0,
+                                y: -6,
+                                scale: 1.02,
+                                transition: { type: 'spring', stiffness: 350, damping: 25 }
+                              }
+                        }
+                        onClick={(e) => openLightbox(index, e)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            openLightbox(index, e);
+                          }
+                        }}
+                        aria-label={`Open photo ${photo.frameNum}: ${photo.caption}`}
+                      >
+                        {/* Washi Tape Strip */}
+                        {photo.tape && photo.tape !== 'none' && (
+                          <div className={`otc-tape otc-tape-${photo.tape}`} aria-hidden="true" />
+                        )}
 
-                      <div className="otc-polaroid-photo-frame">
-                        <img
-                          src={photo.src}
-                          alt={photo.alt}
-                          loading={index < 3 ? 'eager' : 'lazy'}
-                          decoding="async"
-                          className="otc-polaroid-img"
-                          style={{ objectPosition: photo.objectPosition || 'center center' }}
-                        />
-                        <div className="otc-polaroid-zoom-badge" aria-hidden="true">
-                          <ZoomIn size={14} />
+                        {/* Fixed 4:5 Aspect Ratio Photo Container */}
+                        <div className="otc-polaroid-photo-frame">
+                          <img
+                            src={photo.src}
+                            alt={photo.alt}
+                            loading={index < 4 ? 'eager' : 'lazy'}
+                            decoding="async"
+                            className="otc-polaroid-img"
+                            style={{ objectPosition: photo.objectPosition || 'center center' }}
+                          />
+                          <div className="otc-polaroid-zoom-badge" aria-hidden="true">
+                            <ZoomIn size={15} />
+                          </div>
                         </div>
-                      </div>
 
-                      <div className="otc-polaroid-footer">
-                        <p className="otc-polaroid-caption" title={photo.caption}>
-                          {photo.caption}
-                        </p>
-                        <div className="otc-polaroid-meta">
-                          <span className="otc-polaroid-tag">{photo.tag}</span>
-                          <span className="otc-polaroid-num">{formattedNumber}</span>
-                        </div>
-                      </div>
+                        {/* Protected Fixed-Height Caption Footer */}
+                        <figcaption className="otc-polaroid-footer">
+                          <p className="otc-polaroid-caption" title={photo.caption}>
+                            {photo.caption}
+                          </p>
+                          <div className="otc-polaroid-meta">
+                            <span className="otc-polaroid-tag">{photo.tag}</span>
+                            <span className="otc-polaroid-num">{photo.frameNum}</span>
+                          </div>
+                        </figcaption>
+                      </motion.figure>
                     </motion.div>
                   );
                 })}
               </motion.div>
             ) : (
+              /* Contact Sheet Film-Strip Grid */
               <motion.div
                 layout
                 initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.25 }}
                 className="otc-contact-sheet"
               >
-                {photosList.map((photo, index) => {
-                  const formattedNumber = String(index + 1).padStart(2, '0');
-
-                  return (
-                    <div
-                      key={`contact-${photo.id}`}
-                      className="otc-contact-frame"
-                      onClick={(e) => openLightbox(index, e)}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          openLightbox(index, e);
-                        }
-                      }}
-                      aria-label={`View photo ${formattedNumber}: ${photo.caption}`}
-                    >
-                      <div className="otc-contact-header">
-                        <span className="otc-contact-num">🎞️ {formattedNumber}</span>
-                        <span className="otc-contact-tag-badge">{photo.tag}</span>
-                      </div>
-                      <img
-                        src={photo.src}
-                        alt={photo.alt}
-                        loading={index < 3 ? 'eager' : 'lazy'}
-                        decoding="async"
-                        className="otc-contact-thumb"
-                        style={{ objectPosition: photo.objectPosition || 'center center' }}
-                      />
-                      <div className="otc-contact-caption">{photo.caption}</div>
+                {photosList.map((photo, index) => (
+                  <div
+                    key={`contact-${photo.id}`}
+                    className="otc-contact-frame"
+                    onClick={(e) => openLightbox(index, e)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        openLightbox(index, e);
+                      }
+                    }}
+                    aria-label={`View photo ${photo.frameNum}: ${photo.caption}`}
+                  >
+                    <div className="otc-contact-header">
+                      <span className="otc-contact-num">🎞️ {photo.frameNum}</span>
+                      <span className="otc-contact-tag-badge">{photo.tag}</span>
                     </div>
-                  );
-                })}
+                    <img
+                      src={photo.src}
+                      alt={photo.alt}
+                      loading={index < 4 ? 'eager' : 'lazy'}
+                      decoding="async"
+                      className="otc-contact-thumb"
+                      style={{ objectPosition: photo.objectPosition || 'center center' }}
+                    />
+                    <div className="otc-contact-caption">{photo.caption}</div>
+                  </div>
+                ))}
               </motion.div>
             )}
           </div>
-        </>
+        </div>
       )}
 
-      {/* Existing Lightbox dialog (features preserved: swipe, prev/next, keyboard, counter, focus trap, scroll lock) */}
+      {/* Lightbox Dialog */}
       <Lightbox
         isOpen={activePhotoIndex !== null}
         photos={photosList}

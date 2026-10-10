@@ -1,11 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
+import { ArrowDownRight, Download, Check } from 'lucide-react';
 import { personalInfo } from '../data/portfolioData';
 import HeroChat from '../components/HeroChat';
+import resumeUrl from '../assets/MUHAMMED_SWALIH_P_FlowCV_Resume_2026-09-12 (1).pdf';
 
 export default function Hero() {
   const shouldReduceMotion = useReducedMotion();
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const handleDownloadClick = () => {
+    setIsDownloading(true);
+    setTimeout(() => {
+      setIsDownloading(false);
+    }, 2000);
+  };
 
   const handleScroll = (e, targetId) => {
     e.preventDefault();
@@ -98,13 +107,22 @@ export default function Hero() {
             </a>
 
             <a
-              href="#contact"
-              onClick={(e) => handleScroll(e, 'contact')}
-              className="editorial-btn hero-btn-secondary"
-              aria-label="Let's connect"
+              href={resumeUrl}
+              download="Muhammed-Swalih-P-Resume.pdf"
+              onClick={handleDownloadClick}
+              className={`editorial-btn hero-btn-secondary hero-btn-cv ${isDownloading ? 'is-downloading' : ''}`}
+              aria-label="Download CV (PDF)"
+              aria-live="polite"
             >
-              <span>Let's connect</span>
-              <ArrowUpRight size={16} aria-hidden="true" />
+              <span className="hero-btn-cv-label">
+                <span>{isDownloading ? 'Downloading...' : 'Download CV'}</span>
+                {!isDownloading && <span className="hero-btn-cv-badge" aria-hidden="true">PDF</span>}
+              </span>
+              {isDownloading ? (
+                <Check size={18} className="hero-btn-cv-icon-check" aria-hidden="true" />
+              ) : (
+                <Download size={18} className="hero-btn-cv-icon" aria-hidden="true" />
+              )}
             </a>
           </motion.div>
 
