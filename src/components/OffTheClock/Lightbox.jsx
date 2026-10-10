@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function Lightbox({
@@ -19,20 +19,20 @@ export default function Lightbox({
   const photo = photos && currentIndex != null ? photos[currentIndex] : null;
   const total = photos?.length || 0;
 
-  // Preload neighbor images
+  // Preload neighbor lightbox-size images (srcLb) after open
   useEffect(() => {
     if (!isOpen || currentIndex == null || !photos) return;
     const nextIdx = (currentIndex + 1) % total;
     const prevIdx = (currentIndex - 1 + total) % total;
 
-    if (photos[nextIdx]) {
-      const imgNext = new Image();
-      imgNext.src = photos[nextIdx].src;
-    }
-    if (photos[prevIdx]) {
-      const imgPrev = new Image();
-      imgPrev.src = photos[prevIdx].src;
-    }
+    // Preload neighbors' lightbox images
+    [nextIdx, prevIdx].forEach((idx) => {
+      const p = photos[idx];
+      if (p?.srcLb) {
+        const imgEl = new Image();
+        imgEl.src = p.srcLb;
+      }
+    });
   }, [isOpen, currentIndex, total, photos]);
 
   // Lock body scroll and restore focus
@@ -119,6 +119,8 @@ export default function Lightbox({
   if (!isOpen || !photo) return null;
 
   const formattedCounter = `${String(currentIndex + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
+  // Use the large lightbox image if available, fall back to card size
+  const lbSrc = photo.srcLb || photo.src;
 
   return (
     <AnimatePresence>
@@ -127,7 +129,7 @@ export default function Lightbox({
         onClick={onClose}
         aria-hidden="true"
       >
-        <motion.div
+        <m.div
           ref={dialogRef}
           role="dialog"
           aria-modal="true"
@@ -140,6 +142,7 @@ export default function Lightbox({
           transition={{ type: 'spring', damping: 28, stiffness: 350 }}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
+          data-lenis-prevent="true"
         >
           {/* Close button */}
           <button
@@ -181,12 +184,13 @@ export default function Lightbox({
           {/* Main Polaroid View */}
           <div className="otc-lightbox-card">
             <div className="otc-lightbox-photo-wrap">
+              {/* Load the large lightbox image only when opened */}
               <img
-                src={photo.src}
+                src={lbSrc}
                 alt={photo.alt}
                 className="otc-lightbox-img"
                 style={{ objectPosition: photo.objectPosition || 'center center' }}
-                loading="lazy"
+                loading="eager"
                 decoding="async"
               />
             </div>
@@ -214,12 +218,14 @@ export default function Lightbox({
                   src={p.src}
                   alt=""
                   className="otc-lightbox-thumb-img"
+                  loading="lazy"
+                  decoding="async"
                   style={{ objectPosition: p.objectPosition || 'center center' }}
                 />
               </button>
             ))}
           </div>
-        </motion.div>
+        </m.div>
       </div>
     </AnimatePresence>
   );

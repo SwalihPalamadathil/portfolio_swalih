@@ -1,0 +1,434 @@
+/* ============================================================
+   ABOUT SECTION — "Annotated Doodle Portrait" sketchbook page
+   ============================================================ */
+
+/* ── Section shell ── */
+.about-section {
+  padding-top: clamp(4.5rem, 9vw, 8rem);
+  padding-bottom: clamp(4.5rem, 9vw, 8rem);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Paper grain texture ── */
+.about-grain-texture {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.038'/%3E%3C/svg%3E");
+}
+
+/* ── Faint ruled lines (notebook feel) ── */
+.about-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 31px,
+    rgba(22, 21, 15, 0.028) 32px
+  );
+}
+
+.about-container {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Wayfinding row ── */
+.about-wayfinding-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+
+.about-eyebrow-number {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--accent-ink);
+  background-color: var(--accent);
+  padding: 2px 7px 3px;
+  border-radius: 3px;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+
+.about-eyebrow-label {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.about-eyebrow-rule {
+  flex: 1;
+  height: 1px;
+  background-color: var(--border-hairline);
+  min-width: 24px;
+}
+
+/* ── Two-column grid ── */
+.about-editorial-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+}
+
+@media (max-width: 899px) {
+  .about-sketch-column {
+    order: -1;
+  }
+}
+
+@media (min-width: 900px) {
+  .about-editorial-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: clamp(2.5rem, 5vw, 5rem);
+    align-items: start;
+  }
+}
+
+/* ── Left: voice column ── */
+.about-voice-column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.75rem;
+}
+
+/* ── Lede line with lime marker highlights ── */
+.about-lede-line {
+  font-family: var(--font-serif);
+  font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+  font-weight: 400;
+  line-height: 1.18;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  max-width: 28ch;
+  margin: 0;
+}
+
+/* Lime marker highlight — skewed bar behind word */
+.about-highlight {
+  position: relative;
+  display: inline;
+  white-space: nowrap;
+  color: var(--ink);
+}
+
+.about-highlight::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -3px;
+  right: -3px;
+  height: 0.55em;
+  background-color: var(--accent);
+  opacity: 0.72;
+  z-index: -1;
+  transform: skewX(-4deg) skewY(-1deg);
+  border-radius: 2px;
+}
+
+.about-highlight-dim {
+  position: relative;
+  display: inline;
+  white-space: nowrap;
+  color: var(--ink-muted);
+}
+
+.about-highlight-dim::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -2px;
+  right: -2px;
+  height: 0.45em;
+  background-color: rgba(198, 242, 78, 0.35);
+  z-index: -1;
+  transform: skewX(-3deg);
+  border-radius: 2px;
+}
+
+/* ── Body paragraphs ── */
+.about-paragraphs {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  max-width: 58ch;
+}
+
+.about-body-p {
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--ink-muted);
+  margin: 0;
+}
+
+/* ── Context rail ── */
+.about-context-rail {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 58ch;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--border-hairline);
+}
+
+.about-rail-row {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.about-rail-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  flex-shrink: 0;
+  width: 6.5rem;
+}
+
+.about-rail-value {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--ink-muted);
+  margin: 0;
+}
+
+@media (max-width: 480px) {
+  .about-rail-row {
+    flex-direction: column;
+    gap: 0.1rem;
+    padding: 0.7rem 0;
+  }
+  .about-rail-label { width: auto; }
+}
+
+/* ── Corner doodles ── */
+.about-corner-doodles {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  opacity: 0.55;
+  margin-top: 0.5rem;
+}
+
+.about-pencil-svg {
+  width: 80px;
+  height: auto;
+  display: block;
+}
+
+/* ── Right: sketch column ── */
+.about-sketch-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  position: relative;
+}
+
+/* ── Callout notes grid ── */
+.about-callouts-top,
+.about-callouts-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+/* On mobile, hide desktop callout notes (use mobile list instead) */
+@media (max-width: 899px) {
+  .about-callouts-top,
+  .about-callouts-bottom {
+    display: none;
+  }
+}
+
+/* ── Individual callout note card ── */
+.about-callout-note {
+  background-color: var(--bg-raised);
+  border: 1.5px solid var(--border-hairline);
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  padding: 0.65rem 0.85rem 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  cursor: default;
+  position: relative;
+  box-shadow: 2px 2px 0 rgba(22, 21, 15, 0.06);
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.18s;
+  outline: none;
+}
+
+.about-callout-note:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.about-callout-note.is-active,
+.about-callout-note:hover {
+  border-color: var(--accent-ink);
+  box-shadow: 3px 3px 0 rgba(47, 61, 7, 0.14);
+  transform: translateY(-2px);
+}
+
+.about-callout-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.15rem;
+}
+
+.about-callout-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--accent);
+  border: 1px solid var(--accent-ink);
+  flex-shrink: 0;
+  display: inline-block;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.about-callout-note:hover .about-callout-dot,
+.about-callout-note.is-active .about-callout-dot {
+  background-color: var(--accent-ink);
+  transform: scale(1.2);
+}
+
+.about-callout-label {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  display: block;
+}
+
+.about-callout-text {
+  font-family: var(--font-handwriting);
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--ink);
+  display: block;
+}
+
+/* ── SVG scene wrapper ── */
+.about-scene-wrap {
+  position: relative;
+  width: 100%;
+  border-radius: 12px;
+  border: 1.5px solid var(--border-hairline);
+  background-color: var(--bg-raised);
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(22, 21, 15, 0.06);
+}
+
+.about-scene-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ── Mobile callout list ── */
+.about-callouts-mobile-list {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  .about-callouts-mobile-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0 0;
+  }
+}
+
+.about-callout-mobile-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem; /* 15px */
+  line-height: 1.45;
+  color: var(--ink-muted);
+  min-height: 44px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background-color: var(--bg-raised);
+  border: 1px solid var(--border-hairline);
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s, transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.about-callout-mobile-item:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.about-callout-mobile-item.is-active,
+.about-callout-mobile-item:hover {
+  border-color: var(--accent-ink);
+  background-color: #FFFFFF;
+  color: var(--ink);
+}
+
+.about-callout-mobile-item .about-callout-dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+}
+
+.about-callout-mobile-item .about-callout-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  display: inline;
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .about-callout-note {
+    transition: none !important;
+    transform: none !important;
+  }
+  .about-highlight::before,
+  .about-highlight-dim::before {
+    transition: none;
+  }
+}
+
+/* ── Screenreader utility ── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { ArrowDownRight, Download, Check } from 'lucide-react';
 import { personalInfo } from '../data/portfolioData';
 import HeroChat from '../components/HeroChat';
@@ -66,36 +66,36 @@ export default function Hero() {
     <section id="hero" className="hero-editorial" aria-label="Hero Overview">
       <div className="container hero-container">
         {/* Left / Main Content Area (58-62% on desktop) */}
-        <motion.div
+        <m.div
           className="hero-text-area"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
           {/* 1. Small Eyebrow / Metadata */}
-          <motion.div variants={itemVariants} className="hero-eyebrow">
+          <m.div variants={itemVariants} className="hero-eyebrow">
             <span className="eyebrow-text">{personalInfo.roleLabel}</span>
-          </motion.div>
+          </m.div>
 
           {/* 2. Main Heading: Two-line Name */}
-          <motion.h1 variants={itemVariants} className="hero-heading">
+          <m.h1 variants={itemVariants} className="hero-heading">
             <span className="hero-name-line">Muhammed</span>
             <span className="hero-name-line">Swalih P.</span>
-          </motion.h1>
+          </m.h1>
 
           {/* 3. Primary Title */}
-          <motion.h2 variants={itemVariants} className="hero-primary-title">
+          <m.h2 variants={itemVariants} className="hero-primary-title">
             <span>Computer Science Student</span>
             <span className="title-amp"> &amp; Web Developer</span>
-          </motion.h2>
+          </m.h2>
 
           {/* 4. Description */}
-          <motion.p variants={itemVariants} className="hero-description">
+          <m.p variants={itemVariants} className="hero-description">
             {personalInfo.bio}
-          </motion.p>
+          </m.p>
 
           {/* 5. Action Buttons */}
-          <motion.div variants={itemVariants} className="hero-button-group">
+          <m.div variants={itemVariants} className="hero-button-group">
             <a
               href="#projects"
               onClick={(e) => handleScroll(e, 'projects')}
@@ -124,16 +124,16 @@ export default function Hero() {
                 <Download size={18} className="hero-btn-cv-icon" aria-hidden="true" />
               )}
             </a>
-          </motion.div>
+          </m.div>
 
           {/* 6. Grounded AI Visitor Note ("the sticky note that talks back") */}
-          <motion.div variants={itemVariants} className="hero-chat-container">
+          <m.div variants={itemVariants} className="hero-chat-container">
             <HeroChat />
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
 
         {/* Right / Visual Area: Art-Directed Editorial Portrait */}
-        <motion.div
+        <m.div
           className="hero-photo-area"
           variants={photoVariants}
           initial="hidden"
@@ -147,18 +147,21 @@ export default function Hero() {
               
               <div className="hero-portrait-image-box">
                 <img
-                  src={personalInfo.profileImage}
+                  srcSet="/myphoto-sm.webp 480w, /myphoto.webp 900w"
+                  sizes="(max-width: 768px) 280px, 360px"
+                  src="/myphoto.webp"
                   alt="Portrait of Muhammed Swalih"
                   className="hero-portrait-img"
                   width={360}
                   height={450}
                   loading="eager"
                   decoding="async"
+                  fetchpriority="high"
                 />
               </div>
             </div>
           </div>
-        </motion.div>
+        </m.div>
       </div>
     </section>
   );

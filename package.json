@@ -9,8 +9,12 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "prebuild": "node scripts/check-assets.js",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "optimize-images": "node scripts/optimize-images.js",
+    "check-assets": "node scripts/check-assets.js",
+    "analyze": "npx vite-bundle-visualizer"
   },
   "dependencies": {
     "framer-motion": "^13.1.1",
@@ -24,6 +28,7 @@
     "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react": "^6.1.0",
     "oxlint": "^1.79.0",
+    "sharp": "^0.35.5",
     "vite": "^8.2.2"
   }
 }

@@ -2,17 +2,41 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/jpeg" href="/favicon.jpeg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="Personal Portfolio of Muhammed Swalih P. — Computer Science Student & Web Developer. Editorial digital portfolio showcasing frontend projects and toolkit." />
     <meta property="og:title" content="Muhammed Swalih P. — Computer Science Student & Web Developer" />
     <meta property="og:description" content="Personal portfolio of Muhammed Swalih P. showcasing frontend development, CamMap campus navigation, and web projects." />
     <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#F5F2EA" />
     <title>Muhammed Swalih P. — Computer Science Student & Web Developer</title>
-    <!-- Google Fonts: Inter (Sans), Newsreader (Editorial Serif), JetBrains Mono (Technical Labels), Caveat (Handwritten) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,600&display=swap" rel="stylesheet">
+
+    <!-- Preconnect to Google Fonts CDN (2 origins required) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!--
+      Google Fonts: limited to weights actually used.
+      Inter: 400, 500, 600, 700 only (removed 300, 800, 900 — not used in rendered text).
+      Newsreader: same as before (editorial display text).
+      JetBrains Mono: 400, 500 only (removed 600 — not used).
+      Caveat: 400..700 (handwritten notes, kept full range — small font).
+      display=swap: renders fallback immediately, swaps when font arrives.
+    -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Preload the LCP image (hero portrait): serves WebP on capable browsers -->
+    <link
+      rel="preload"
+      as="image"
+      href="/myphoto-sm.webp"
+      imagesrcset="/myphoto-sm.webp 480w, /myphoto.webp 900w"
+      imagesizes="(max-width: 768px) 280px, 360px"
+      fetchpriority="high"
+    />
   </head>
   <body>
     <div id="root"></div>

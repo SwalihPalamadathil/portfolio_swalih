@@ -1,0 +1,936 @@
+/* ============================================================
+   SKILLS & CURRENTLY LEARNING — SKETCHBOOK PAGES
+   Tokens: --bg, --bg-raised, --ink, --ink-muted, --ink-faint, --accent, --accent-ink
+   Fonts: Inter (--font-sans), Newsreader (--font-serif),
+          JetBrains Mono (--font-mono), Caveat (--font-handwriting)
+   ============================================================ */
+
+/* ── Section Shell ── */
+.skills-section {
+  padding-top: clamp(4.5rem, 8vw, 7.5rem);
+  padding-bottom: clamp(4.5rem, 8vw, 7.5rem);
+  position: relative;
+  background-color: var(--bg);
+  overflow: hidden;
+}
+
+/* ── Pegboard / notebook dotted grid ── */
+.skills-dotgrid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: radial-gradient(circle, rgba(22, 21, 15, 0.055) 1.5px, transparent 1.5px);
+  background-size: 24px 24px;
+}
+
+.skills-container {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Section Wayfinding ── */
+.skills-wayfinding-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: clamp(1.25rem, 3vw, 2rem);
+}
+
+.skills-eyebrow-number {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--accent-ink);
+  background-color: var(--accent);
+  padding: 3px 8px 2px;
+  border-radius: 3px;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+
+.skills-eyebrow-label {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.skills-eyebrow-rule {
+  flex: 1;
+  height: 1px;
+  background-color: var(--border-hairline);
+  min-width: 24px;
+}
+
+/* ── Display Headline & Hint ── */
+.skills-display-line {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(2rem, 4.5vw, 3.25rem);
+  font-weight: 400;
+  color: var(--ink);
+  line-height: 1.15;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.01em;
+}
+
+.skills-interaction-hint {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-muted);
+  margin: 0 0 clamp(2rem, 4vw, 3rem) 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.skills-hint-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border-hairline);
+  border-radius: 3px;
+  font-size: 0.7rem;
+}
+
+/* ── Main Skills Spread Layout ── */
+.skills-spread-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (min-width: 1080px) {
+  .skills-spread-layout {
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 3rem;
+  }
+}
+
+/* ── Sticker Sheet Card ── */
+.sticker-sheet-card {
+  position: relative;
+  background: var(--bg-raised);
+  border: 1.5px solid var(--border-medium);
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  padding: clamp(1.5rem, 3.5vw, 2.75rem);
+  box-shadow: 0 6px 20px rgba(22, 21, 15, 0.04), 0 1px 3px rgba(22, 21, 15, 0.03);
+}
+
+/* Perforated top edge illusion */
+.sticker-sheet-perf {
+  position: absolute;
+  top: 0;
+  left: 24px;
+  right: 24px;
+  height: 6px;
+  border-top: 2px dashed rgba(22, 21, 15, 0.18);
+  pointer-events: none;
+}
+
+.sticker-sheet-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.sticker-sheet-title {
+  font-family: var(--font-handwriting);
+  font-size: clamp(1.6rem, 2.5vw, 2.1rem);
+  color: var(--ink);
+  margin: 0;
+  line-height: 1;
+}
+
+.sticker-sheet-subtitle {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ── Sticker Grid ── */
+.sticker-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+@media (min-width: 600px) {
+  .sticker-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .sticker-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+/* ── Single Sticker Item ── */
+.skill-sticker-item {
+  position: relative;
+  list-style: none;
+}
+
+/* Sticker Button Trigger */
+.skill-sticker-btn {
+  position: relative;
+  width: 100%;
+  min-height: 72px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 12px 18px 12px 16px;
+  background-color: #FFFFFF;
+  border: 3px solid #FFFFFF;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+  outline: none;
+  box-shadow: 0 4px 12px rgba(22, 21, 15, 0.07), 0 1px 3px rgba(22, 21, 15, 0.05);
+  transform: rotate(var(--tilt, 0deg));
+  transform-origin: center center;
+  transition: transform 0.25s var(--ease-editorial),
+              box-shadow 0.25s var(--ease-editorial),
+              border-color 0.2s ease,
+              background-color 0.2s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Accessible focus ring */
+.skill-sticker-btn:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+  transform: rotate(0deg) translateY(-4px);
+  box-shadow: 0 8px 20px rgba(22, 21, 15, 0.12);
+}
+
+/* ── Die-Cut Shapes ── */
+.shape-blob {
+  border-radius: 255px 25px 225px 35px / 35px 225px 25px 255px;
+}
+
+.shape-round {
+  border-radius: 50px 20px 45px 25px / 25px 45px 20px 50px;
+}
+
+.shape-pill {
+  border-radius: 9999px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.shape-ticket {
+  border-radius: 14px;
+  border-style: solid;
+}
+
+.shape-burst {
+  border-radius: 22px 38px 22px 38px / 38px 22px 38px 22px;
+}
+
+.shape-hex {
+  border-radius: 16px 26px 16px 26px / 26px 16px 26px 16px;
+}
+
+/* ── Color Variations ── */
+.fill-accent {
+  background-color: var(--accent);
+  color: var(--accent-ink);
+  border-color: #FFFFFF;
+}
+
+.fill-accent .sticker-detail {
+  color: var(--accent-ink);
+  opacity: 0.85;
+}
+
+.fill-soft {
+  background-color: #FCFAF6;
+  border-color: #FFFFFF;
+}
+
+/* ── Dog-Ear Corner Peel (CSS pseudo-element) ── */
+.skill-sticker-btn::after {
+  content: '';
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(135deg, transparent 50%, rgba(22, 21, 15, 0.12) 50%, #FAF8F2 60%);
+  border-bottom-left-radius: 3px;
+  box-shadow: -1px 1px 2px rgba(22, 21, 15, 0.08);
+  opacity: 0.6;
+  transition: width 0.25s var(--ease-editorial),
+              height 0.25s var(--ease-editorial),
+              opacity 0.2s ease;
+  pointer-events: none;
+}
+
+/* Hover, Focus & Active Peel State */
+@media (hover: hover) {
+  .skill-sticker-btn:hover {
+    transform: rotate(0deg) translateY(-4px);
+    box-shadow: 0 10px 24px rgba(22, 21, 15, 0.13), 0 2px 6px rgba(22, 21, 15, 0.06);
+  }
+
+  .skill-sticker-btn:hover::after {
+    width: 18px;
+    height: 18px;
+    opacity: 1;
+    box-shadow: -2px 2px 4px rgba(22, 21, 15, 0.14);
+  }
+}
+
+.skill-sticker-btn.is-open {
+  transform: rotate(0deg) translateY(-4px);
+  box-shadow: 0 10px 24px rgba(22, 21, 15, 0.14), 0 2px 6px rgba(22, 21, 15, 0.06);
+  border-color: var(--accent);
+}
+
+.skill-sticker-btn.is-open::after {
+  width: 18px;
+  height: 18px;
+  opacity: 1;
+  box-shadow: -2px 2px 4px rgba(22, 21, 15, 0.14);
+}
+
+/* Sticker Label Content */
+.sticker-header-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+}
+
+.sticker-doodle-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.sticker-name {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.sticker-detail {
+  font-family: var(--font-sans);
+  font-size: 0.73rem;
+  color: var(--ink-muted);
+  line-height: 1.35;
+  margin-top: 3px;
+  display: block;
+}
+
+/* ── Context Note Bubble (Handwritten Note) ── */
+.sticker-note-bubble {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  min-width: 200px;
+  max-width: 280px;
+  background: #FFFFFF;
+  border: 1.5px solid var(--ink);
+  border-radius: 14px;
+  padding: 10px 14px 10px 14px;
+  box-shadow: 0 8px 24px rgba(22, 21, 15, 0.14), 0 2px 6px rgba(22, 21, 15, 0.08);
+  pointer-events: auto;
+  text-align: left;
+}
+
+/* Bubble speech tail pointing down */
+.sticker-note-bubble::before {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 7px 7px 0 7px;
+  border-style: solid;
+  border-color: var(--ink) transparent transparent transparent;
+}
+
+.sticker-note-bubble::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px 5px 0 5px;
+  border-style: solid;
+  border-color: #FFFFFF transparent transparent transparent;
+}
+
+.sticker-note-close {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  background: transparent;
+  border: none;
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+}
+
+.sticker-note-close:hover {
+  color: var(--ink);
+}
+
+.sticker-note-text {
+  font-family: var(--font-handwriting);
+  font-size: 1.25rem;
+  line-height: 1.25;
+  color: var(--ink);
+  margin: 0;
+  display: block;
+}
+
+.sticker-note-meta {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+  display: block;
+}
+
+/* ── Margin Aside (Laptop Doodle & Sketchbook Notes) ── */
+.skills-margin-aside {
+  display: none;
+}
+
+@media (min-width: 1080px) {
+  .skills-margin-aside {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem 1rem;
+    background: transparent;
+    border-left: 1px dashed var(--border-medium);
+  }
+}
+
+.skills-margin-laptop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.skills-margin-caption {
+  font-family: var(--font-handwriting);
+  font-size: 1.2rem;
+  color: var(--ink-muted);
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.skills-margin-doodles {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  opacity: 0.75;
+}
+
+/* ── Page Divider between Skills and Learning ── */
+.sketchbook-page-divider {
+  position: relative;
+  margin-top: clamp(3.5rem, 6vw, 5.5rem);
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sketchbook-divider-line {
+  width: 100%;
+  height: 2px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--ink-faint) 0px,
+    var(--ink-faint) 6px,
+    transparent 6px,
+    transparent 12px
+  );
+  opacity: 0.45;
+}
+
+.sketchbook-divider-badge {
+  position: absolute;
+  background: var(--bg);
+  padding: 0 16px;
+  font-family: var(--font-handwriting);
+  font-size: 1.35rem;
+  color: var(--ink-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ============================================================
+   CURRENTLY LEARNING — HAND-DRAWN TRAIL MAP
+   ============================================================ */
+
+.learning-map-section {
+  position: relative;
+  width: 100%;
+}
+
+.learning-map-header {
+  margin-bottom: 1.5rem;
+}
+
+.learning-map-title {
+  font-family: var(--font-handwriting);
+  font-size: clamp(1.8rem, 3.2vw, 2.5rem);
+  color: var(--ink);
+  margin: 0 0 0.35rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.learning-map-subtitle {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+  margin: 0;
+  max-width: 600px;
+}
+
+/* ── Trail Map Card / Canvas ── */
+.learning-map-card {
+  position: relative;
+  background: #FCFAF6;
+  border: 1.5px solid var(--border-medium);
+  border-radius: 18px;
+  padding: clamp(1.25rem, 3vw, 2.25rem);
+  box-shadow: 0 4px 16px rgba(22, 21, 15, 0.05);
+  overflow: hidden;
+  min-height: 480px;
+}
+
+/* Faint topographic / contour background */
+.learning-map-contours {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: radial-gradient(ellipse at 30% 40%, var(--ink) 0%, transparent 60%),
+                    radial-gradient(ellipse at 75% 70%, var(--ink) 0%, transparent 55%);
+}
+
+/* Margin decorative compass doodle */
+.learning-compass-corner {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  pointer-events: none;
+  opacity: 0.85;
+  z-index: 2;
+}
+
+/* ── Desktop Map Layout ── */
+.learning-map-desktop {
+  display: none;
+  position: relative;
+  width: 100%;
+  height: 400px;
+}
+
+@media (min-width: 769px) {
+  .learning-map-desktop {
+    display: block;
+  }
+}
+
+.learning-trail-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Trail Pin Station on Desktop */
+.trail-station-desktop {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+}
+
+/* Station 1 (Python) */
+.station-python {
+  top: 28%;
+  left: 28%;
+}
+
+/* Station 2 (Ethical Hacking) */
+.station-hacking {
+  top: 66%;
+  left: 62%;
+}
+
+/* Station 3 (Next) */
+.station-next {
+  top: 36%;
+  left: 88%;
+}
+
+/* Pin marker button / flag */
+.trail-pin-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #FFFFFF;
+  border: 2px solid var(--ink);
+  border-radius: 20px;
+  padding: 6px 14px 6px 10px;
+  box-shadow: 0 4px 12px rgba(22, 21, 15, 0.1);
+  cursor: default;
+  transition: transform 0.2s var(--ease-editorial), box-shadow 0.2s ease;
+}
+
+.station-python .trail-pin-btn {
+  border-color: var(--accent-ink);
+  background: #FFFFFF;
+}
+
+.trail-pin-badge {
+  font-family: var(--font-handwriting);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1;
+}
+
+/* "You are here" pulsing badge */
+.you-are-here-tag {
+  position: absolute;
+  top: -26px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: 12px;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(47, 61, 7, 0.15);
+}
+
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--accent-ink);
+  animation: pulse-dot 1.8s infinite ease-in-out;
+}
+
+@keyframes pulse-dot {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  50% { transform: scale(1.4); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.8; }
+}
+
+/* Trail station paper note cards */
+.trail-station-card {
+  position: absolute;
+  width: 250px;
+  background: #FFFFFF;
+  border: 1.5px solid var(--border-medium);
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: 0 6px 18px rgba(22, 21, 15, 0.07);
+}
+
+/* Card position for Python (below the pin) */
+.station-python .trail-station-card {
+  top: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Card position for Ethical Hacking (above the pin) */
+.station-hacking .trail-station-card {
+  bottom: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.trail-card-title {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 4px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.trail-card-status {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--accent-ink);
+  background: var(--accent);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.trail-card-context {
+  font-family: var(--font-handwriting);
+  font-size: 1.18rem;
+  line-height: 1.25;
+  color: var(--ink);
+  margin: 0 0 6px 0;
+}
+
+.trail-card-detail {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+  line-height: 1.35;
+  margin: 0;
+}
+
+/* Trail end pin (next: ???) */
+.station-next .trail-next-card {
+  background: rgba(239, 235, 225, 0.7);
+  border: 1.5px dashed var(--ink-faint);
+  border-radius: 10px;
+  padding: 8px 12px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.trail-next-text {
+  font-family: var(--font-handwriting);
+  font-size: 1.25rem;
+  color: var(--ink-muted);
+}
+
+/* ── Mobile Map Layout (Vertical Trail) ── */
+.learning-map-mobile {
+  display: block;
+  position: relative;
+  width: 100%;
+}
+
+@media (min-width: 769px) {
+  .learning-map-mobile {
+    display: none;
+  }
+}
+
+.learning-mobile-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: relative;
+  padding-left: 28px;
+  margin-top: 1rem;
+}
+
+/* Vertical dashed trail line on mobile */
+.learning-mobile-timeline::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  bottom: 24px;
+  left: 10px;
+  width: 2px;
+  background-image: repeating-linear-gradient(
+    180deg,
+    var(--ink) 0px,
+    var(--ink) 5px,
+    transparent 5px,
+    transparent 10px
+  );
+  opacity: 0.45;
+}
+
+.learning-mobile-node {
+  position: relative;
+}
+
+/* Pin indicator on the mobile line */
+.learning-mobile-dot {
+  position: absolute;
+  top: 14px;
+  left: -28px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  border: 2px solid var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.learning-mobile-node.is-current .learning-mobile-dot {
+  border-color: var(--accent-ink);
+  background: var(--accent);
+}
+
+.learning-mobile-dot-inner {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-ink);
+}
+
+.learning-mobile-card {
+  background: #FFFFFF;
+  border: 1.5px solid var(--border-medium);
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 4px 12px rgba(22, 21, 15, 0.05);
+}
+
+.learning-mobile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 6px;
+}
+
+.learning-mobile-name {
+  font-family: var(--font-handwriting);
+  font-size: 1.4rem;
+  color: var(--ink);
+  line-height: 1;
+}
+
+.learning-mobile-badge {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--accent-ink);
+  background: var(--accent);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.learning-mobile-context {
+  font-family: var(--font-handwriting);
+  font-size: 1.15rem;
+  line-height: 1.3;
+  color: var(--ink);
+  margin: 0 0 6px 0;
+}
+
+.learning-mobile-detail {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  line-height: 1.35;
+  margin: 0;
+}
+
+.learning-mobile-next {
+  border: 1.5px dashed var(--ink-faint);
+  background: rgba(239, 235, 225, 0.5);
+  border-radius: 12px;
+  padding: 12px 16px;
+  text-align: center;
+}
+
+.learning-mobile-next-text {
+  font-family: var(--font-handwriting);
+  font-size: 1.25rem;
+  color: var(--ink-muted);
+}
+
+/* ── Decorative scenery accents in trail map ── */
+.map-scenery-item {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.7;
+}
+
+.scenery-tree-1 {
+  bottom: 24px;
+  left: 45px;
+}
+
+.scenery-tree-2 {
+  top: 35px;
+  left: 48%;
+}
+
+.scenery-hills {
+  bottom: 16px;
+  right: 50px;
+}
+
+.scenery-cloud {
+  top: 20px;
+  left: 120px;
+  opacity: 0.5;
+}
+
+/* ── Reduced Motion Support ── */
+@media (prefers-reduced-motion: reduce) {
+  .pulse-dot {
+    animation: none;
+  }
+
+  .skill-sticker-btn {
+    transition: none;
+    transform: none !important;
+  }
+
+  .skill-sticker-btn::after {
+    transition: none;
+  }
+}

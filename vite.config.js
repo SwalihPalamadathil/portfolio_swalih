@@ -73,18 +73,30 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react(), apiDevServerPlugin()],
     build: {
+      // Target modern browsers — smaller output, no polyfills for very old browsers
+      target: 'es2020',
+      // Split CSS per async chunk (reduces initial CSS payload)
+      cssCodeSplit: true,
+      // No source maps in production (saves bandwidth, no perf gain from them)
+      sourcemap: false,
+      // Honest chunk size limit — warn at 500 KB (not raised to hide warnings)
+      chunkSizeWarningLimit: 500,
       rollupOptions: {
         output: {
           manualChunks(id) {
-            if (id.includes('node_modules/framer-motion')) {
-              return 'vendor-motion'
-            }
+            // React core (react + react-dom) — loaded always
             if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
               return 'vendor-react'
             }
+            // Framer Motion — heavy but needed across sections
+            if (id.includes('node_modules/framer-motion')) {
+              return 'vendor-motion'
+            }
+            // Lenis smooth scroll — small, loaded always
             if (id.includes('node_modules/lenis')) {
               return 'vendor-lenis'
             }
+            // Lucide icons — tree-shaken, no explicit chunk needed
           }
         }
       }

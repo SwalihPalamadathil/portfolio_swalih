@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight, Compass, X, ExternalLink } from 'lucide-react';
 import { projectsData } from '../data/portfolioData';
 
@@ -59,7 +59,7 @@ export default function Work() {
         </div>
 
         {/* The Pinned Project Sheet: Asymmetric Spread */}
-        <motion.div
+        <m.div
           className="work-editorial-spread"
           variants={containerVariants}
           initial="hidden"
@@ -67,14 +67,14 @@ export default function Work() {
           viewport={{ once: true, margin: '-40px' }}
         >
           {/* Left / Main Visual Column (Cols 1–7) */}
-          <motion.div variants={itemVariants} className="work-visual-column">
+          <m.div variants={itemVariants} className="work-visual-column">
             {/* Visual Frame Wrapper with Architectural Offset Outline */}
             <div className="work-image-frame-wrapper">
               <div className="work-image-offset-frame" aria-hidden="true" />
 
               <div className="work-image-box">
                 <img
-                  src="/cammapphoto.png"
+                  src="/cammapphoto.webp"
                   alt="CamMap interface preview showing EMEA College campus navigation and route calculation"
                   className="work-screenshot-img"
                   width={1920}
@@ -91,7 +91,7 @@ export default function Work() {
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                   >
-                    <motion.path
+                    <m.path
                       d="M 12 28 C 10 12, 50 6, 110 8 C 154 9, 164 24, 158 38 C 150 49, 90 51, 30 47 C 12 45, 6 34, 20 22 C 34 12, 68 8, 115 10"
                       stroke="var(--accent)"
                       strokeWidth="2"
@@ -119,7 +119,7 @@ export default function Work() {
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                 >
-                  <motion.path
+                  <m.path
                     d="M 8 10 C 32 6, 52 38, 82 24"
                     stroke="var(--accent)"
                     strokeWidth="2.25"
@@ -134,7 +134,7 @@ export default function Work() {
                       ease: [0.22, 1, 0.36, 1]
                     }}
                   />
-                  <motion.path
+                  <m.path
                     d="M 70 17 L 84 24 L 75 32"
                     stroke="var(--accent)"
                     strokeWidth="2.25"
@@ -152,10 +152,10 @@ export default function Work() {
                 </svg>
               </div>
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Right / Editorial Narrative Column (Cols 8–12) */}
-          <motion.div variants={itemVariants} className="work-narrative-column">
+          <m.div variants={itemVariants} className="work-narrative-column">
             <div>
               {/* Project Title with Hand-drawn Doodle 3: Scribbled Underline */}
               <div className="work-title-wrapper">
@@ -167,7 +167,7 @@ export default function Work() {
                   xmlns="http://www.w3.org/2000/svg"
                   aria-hidden="true"
                 >
-                  <motion.path
+                  <m.path
                     d="M 4 11 C 32 16, 68 4, 105 12 C 122 15, 136 8, 146 9.5"
                     stroke="var(--accent)"
                     strokeWidth="2.75"
@@ -226,13 +226,13 @@ export default function Work() {
                 <span>{isPreviewOpen ? 'Close live preview' : 'Peek inside (live preview)'}</span>
               </button>
             </div>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
 
         {/* Option 1: Live Interactive Embedded Preview Panel */}
         <AnimatePresence>
           {isPreviewOpen && (
-            <motion.div
+            <m.div
               ref={previewRef}
               id="cammap-live-preview"
               className="work-live-preview-panel"
@@ -300,7 +300,7 @@ export default function Work() {
                   sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
                 />
               </div>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>

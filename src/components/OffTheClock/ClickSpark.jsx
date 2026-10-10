@@ -18,8 +18,8 @@ export default function ClickSpark({ targetRef }) {
     if (!target) return;
 
     const handleClick = (e) => {
-      // Don't trigger spark on interactive inputs, buttons, canvas, or sliders
-      if (e.target.closest('button, a, input, canvas, [role="slider"], [role="button"]')) {
+      // Don't trigger spark on interactive inputs, buttons, or sliders
+      if (e.target.closest('button, a, input, [role="slider"], [role="button"]')) {
         return;
       }
 

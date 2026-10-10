@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { personalInfo } from '../data/portfolioData';
 
 const EMAIL_UNDERLINE =
@@ -9,7 +9,7 @@ const EMAIL_CHECK = 'M 8 12 L 20 20 L 48 5';
 
 function PaperPlaneMark({ flying, shouldReduceMotion }) {
   return (
-    <motion.svg
+    <m.svg
       className="contact-plane-svg"
       viewBox="0 0 40 32"
       width="28"
@@ -57,7 +57,7 @@ function PaperPlaneMark({ flying, shouldReduceMotion }) {
         strokeWidth="1.55"
         strokeLinecap="round"
       />
-    </motion.svg>
+    </m.svg>
   );
 }
 
@@ -239,7 +239,7 @@ export default function Contact() {
               xmlns="http://www.w3.org/2000/svg"
               aria-hidden="true"
             >
-              <motion.path
+              <m.path
                 d={EMAIL_CHECK}
                 stroke="var(--accent)"
                 strokeWidth="2.4"
@@ -262,7 +262,7 @@ export default function Contact() {
               aria-hidden="true"
               preserveAspectRatio="none"
             >
-              <motion.path
+              <m.path
                 d={EMAIL_UNDERLINE}
                 stroke="var(--accent)"
                 strokeWidth="2.4"
@@ -322,7 +322,7 @@ export default function Contact() {
 
             <AnimatePresence>
               {copied && (
-                <motion.span
+                <m.span
                   className="contact-copied-caption"
                   initial={{ opacity: shouldReduceMotion ? 1 : 0, y: shouldReduceMotion ? 0 : 4 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -330,7 +330,7 @@ export default function Contact() {
                   transition={{ duration: shouldReduceMotion ? 0 : 0.28 }}
                 >
                   copied!
-                </motion.span>
+                </m.span>
               )}
             </AnimatePresence>
           </div>

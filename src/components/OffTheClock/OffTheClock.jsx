@@ -1,8 +1,8 @@
 import React, { useRef } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { sectionHeader, photos, doodlesList } from '../../data/offTheClock';
 import PhotoBooth from './PhotoBooth';
-import DoodleCorner from './DoodleCorner';
+import DoodleStrip from './DoodleStrip';
 import ClickSpark from './ClickSpark';
 import './offTheClock.css';
 
@@ -25,7 +25,7 @@ export default function OffTheClock() {
 
       <div className="container otc-container">
         {/* Section Header */}
-        <motion.div
+        <m.div
           className="otc-header"
           initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 18 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -52,7 +52,7 @@ export default function OffTheClock() {
                   xmlns="http://www.w3.org/2000/svg"
                   aria-hidden="true"
                 >
-                  <motion.path
+                  <m.path
                     d="M 4 8 C 45 4, 110 3, 176 10 C 130 9, 80 11, 40 12"
                     stroke="var(--accent)"
                     strokeWidth="2.8"
@@ -76,7 +76,7 @@ export default function OffTheClock() {
             <div className="otc-header-right">
               <div className="otc-header-stats-card">
                 <span className="otc-header-stats-text">
-                  {photos.length} photos · {doodlesList.length} doodles · 1 sketchpad
+                  {photos.length} photos · {doodlesList.length} doodles
                 </span>
                 <svg
                   className="otc-header-down-arrow"
@@ -96,26 +96,13 @@ export default function OffTheClock() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </m.div>
 
         {/* 1. Photo Booth with Polaroids, Lightbox & Contact Sheet */}
         <PhotoBooth />
 
-        {/* Subtle Hand-Drawn Dashed Divider */}
-        <div className="otc-section-divider" aria-hidden="true">
-          <svg viewBox="0 0 600 12" preserveAspectRatio="none" className="otc-divider-svg">
-            <path
-              d="M 0 6 Q 150 10, 300 6 Q 450 2, 600 6"
-              stroke="var(--border-medium)"
-              strokeWidth="1.5"
-              strokeDasharray="6 8"
-              fill="none"
-            />
-          </svg>
-        </div>
-
-        {/* 2. Doodle Corner & Interactive Notebook Sketchpad */}
-        <DoodleCorner />
+        {/* 2. Compact Doodle Strip */}
+        <DoodleStrip />
       </div>
     </section>
   );

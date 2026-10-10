@@ -1,15 +1,17 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Shuffle, RotateCcw, Grid, Image as ImageIcon, ZoomIn, Layers } from 'lucide-react';
 import { photos as rawPhotos, photoCollectionConfig } from '../../data/offTheClock';
 import Lightbox from './Lightbox';
 
 export const MOBILE_BREAKPOINT = 768;
 
-const INITIAL_PHOTOS = rawPhotos.map((p, idx) => ({
-  ...p,
-  frameNum: String(idx + 1).padStart(2, '0')
-}));
+const INITIAL_PHOTOS = (rawPhotos || [])
+  .filter((p) => Boolean(p && p.src))
+  .map((p, idx) => ({
+    ...p,
+    frameNum: String(idx + 1).padStart(2, '0')
+  }));
 
 // Underneath cards for the collapsed pile aesthetic on mobile
 const UNDERNEATH_CARDS = [
@@ -54,7 +56,7 @@ export default function PhotoBooth() {
   const coverIndex = photoCollectionConfig?.coverIndex ?? 0;
   const coverPhoto = photosList[coverIndex] || photosList[0];
 
-  // Shuffle card order with smooth layout transition in the strict grid
+  // Shuffle card order
   const handleShuffle = () => {
     setPhotosList((prev) => {
       const copy = [...prev];
@@ -197,7 +199,7 @@ export default function PhotoBooth() {
           <AnimatePresence mode="wait">
             {!isCollectionOpen ? (
               /* 1. COLLAPSED STATE (DEFAULT): ONE compact collection card */
-              <motion.div
+              <m.div
                 key="collapsed-pile"
                 className="otc-collection-stage"
                 initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 12 }}
@@ -205,7 +207,7 @@ export default function PhotoBooth() {
                 exit={{ opacity: 0, scale: 0.96 }}
                 transition={{ duration: shouldReduceMotion ? 0.05 : 0.3 }}
               >
-                <motion.div
+                <m.div
                   className="otc-pile-interactive-btn"
                   role="button"
                   tabIndex={0}
@@ -264,6 +266,8 @@ export default function PhotoBooth() {
                           alt={coverPhoto.alt}
                           loading="eager"
                           decoding="async"
+                          width={coverPhoto.width || 800}
+                          height={coverPhoto.height || 600}
                           className="otc-polaroid-img"
                           style={{ objectPosition: coverPhoto.objectPosition || 'center center' }}
                         />
@@ -317,11 +321,11 @@ export default function PhotoBooth() {
                     </svg>
                     <span className="otc-collection-hint-text">tap the stack</span>
                   </div>
-                </motion.div>
-              </motion.div>
+                </m.div>
+              </m.div>
             ) : (
               /* 2. OPEN MOBILE BOARD: Horizontal Swipe or Compact Grid */
-              <motion.div
+              <m.div
                 key="open-collection"
                 className="otc-open-collection-view"
                 initial={{ opacity: 0 }}
@@ -355,13 +359,14 @@ export default function PhotoBooth() {
                     onScroll={onScrollThrottled}
                     tabIndex={0}
                     aria-label="Swipeable photo board. Use arrow keys to navigate."
+                    data-lenis-prevent="true"
                   >
                     {photosList.map((photo, index) => {
                       const isActive = index === activeCenterIndex;
                       const cardTilt = shouldReduceMotion ? 0 : (isActive ? 0 : Number(photo.rotation) || 0);
 
                       return (
-                        <motion.figure
+                        <m.figure
                           key={photo.id}
                           className={`otc-polaroid-card otc-polaroid-mobile ${isActive ? 'is-centered' : ''}`}
                           initial={{ opacity: 0, y: 16 }}
@@ -402,8 +407,10 @@ export default function PhotoBooth() {
                             <img
                               src={photo.src}
                               alt={photo.alt}
-                              loading={index < 4 ? 'eager' : 'lazy'}
+                              loading={index < 3 ? 'eager' : 'lazy'}
                               decoding="async"
+                              width={photo.width || 800}
+                              height={photo.height || 600}
                               className="otc-polaroid-img"
                               style={{ objectPosition: photo.objectPosition || 'center center' }}
                             />
@@ -423,7 +430,7 @@ export default function PhotoBooth() {
                               <span className="otc-polaroid-num">{photo.frameNum}</span>
                             </div>
                           </figcaption>
-                        </motion.figure>
+                        </m.figure>
                       );
                     })}
                   </div>
@@ -454,6 +461,8 @@ export default function PhotoBooth() {
                           alt={photo.alt}
                           loading={index < 4 ? 'eager' : 'lazy'}
                           decoding="async"
+                          width={photo.width || 800}
+                          height={photo.height || 600}
                           className="otc-contact-thumb"
                           style={{ objectPosition: photo.objectPosition || 'center center' }}
                         />
@@ -504,7 +513,7 @@ export default function PhotoBooth() {
                     )}
                   </button>
                 </div>
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
         </div>
@@ -574,35 +583,31 @@ export default function PhotoBooth() {
           {/* Desk Surface / Dotted Grid */}
           <div className="otc-wall-surface">
             {viewMode === 'wall' ? (
-              <motion.div layout className="otc-wall-grid">
+              /* Wall grid — no `layout` prop (avoids expensive layout animations) */
+              <div className="otc-wall-grid">
                 {photosList.map((photo, index) => {
                   const cardTilt = shouldReduceMotion ? 0 : Number(photo.rotation) || 0;
 
                   return (
-                    <motion.div
+                    <m.div
                       key={photo.id}
-                      layout
                       className="otc-wall-cell"
                       initial={{
                         opacity: 0,
                         y: shouldReduceMotion ? 0 : 16,
-                        filter: shouldReduceMotion
-                          ? 'none'
-                          : 'grayscale(35%) sepia(20%) blur(2px)'
                       }}
                       whileInView={{
                         opacity: 1,
                         y: 0,
-                        filter: 'grayscale(0%) sepia(0%) blur(0px)'
                       }}
                       viewport={{ once: true, margin: '-20px' }}
                       transition={{
-                        duration: shouldReduceMotion ? 0.05 : 0.55,
+                        duration: shouldReduceMotion ? 0.05 : 0.45,
                         delay: shouldReduceMotion ? 0 : (index % 4) * 0.06,
                         ease: [0.22, 1, 0.36, 1]
                       }}
                     >
-                      <motion.figure
+                      <m.figure
                         className="otc-polaroid-card"
                         style={{ rotate: cardTilt }}
                         whileHover={
@@ -638,6 +643,8 @@ export default function PhotoBooth() {
                             alt={photo.alt}
                             loading={index < 4 ? 'eager' : 'lazy'}
                             decoding="async"
+                            width={photo.width || 800}
+                            height={photo.height || 600}
                             className="otc-polaroid-img"
                             style={{ objectPosition: photo.objectPosition || 'center center' }}
                           />
@@ -656,15 +663,14 @@ export default function PhotoBooth() {
                             <span className="otc-polaroid-num">{photo.frameNum}</span>
                           </div>
                         </figcaption>
-                      </motion.figure>
-                    </motion.div>
+                      </m.figure>
+                    </m.div>
                   );
                 })}
-              </motion.div>
+              </div>
             ) : (
               /* Contact Sheet Film-Strip Grid */
-              <motion.div
-                layout
+              <m.div
                 initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.25 }}
@@ -694,13 +700,15 @@ export default function PhotoBooth() {
                       alt={photo.alt}
                       loading={index < 4 ? 'eager' : 'lazy'}
                       decoding="async"
+                      width={photo.width || 800}
+                      height={photo.height || 600}
                       className="otc-contact-thumb"
                       style={{ objectPosition: photo.objectPosition || 'center center' }}
                     />
                     <div className="otc-contact-caption">{photo.caption}</div>
                   </div>
                 ))}
-              </motion.div>
+              </m.div>
             )}
           </div>
         </div>

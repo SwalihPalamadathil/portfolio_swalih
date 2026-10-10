@@ -11,6 +11,7 @@
   top: 0;
   z-index: 100;
   width: 100%;
+  padding-top: var(--sat);
   transition: background-color 0.25s ease, border-color 0.25s ease, height 0.25s ease, backdrop-filter 0.25s ease;
 }
 
@@ -18,16 +19,23 @@
 .portfolio-navbar.is-top {
   background-color: transparent;
   border-bottom: 1px solid transparent;
-  height: 72px;
+  height: calc(72px + var(--sat));
 }
 
-/* Scrolled State: ~85% opacity, subtle blur(8px), 1px bottom hairline in --ink-faint */
+/* Scrolled State: ~88% opacity, subtle blur(8px), 1px bottom hairline in --ink-faint */
 .portfolio-navbar.is-scrolled {
-  background-color: rgba(245, 242, 234, 0.88);
+  background-color: rgba(245, 242, 234, 0.94);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--ink-faint);
-  height: 64px;
+  border-bottom: 1px solid var(--border-hairline);
+  height: calc(64px + var(--sat));
+}
+
+/* Mobile Menu Open State: solid ivory background */
+.portfolio-navbar.is-menu-open {
+  background-color: var(--bg) !important;
+  border-bottom: 1px solid var(--border-medium);
+  height: calc(64px + var(--sat));
 }
 
 .navbar-inner {
@@ -37,12 +45,15 @@
   height: 100%;
 }
 
-/* Wordmark (Left) */
+/* Wordmark (Left) — 44px min tap target */
 .navbar-wordmark {
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
+  min-height: 44px;
+  padding: 4px 0;
   text-decoration: none;
   cursor: pointer;
+  touch-action: manipulation;
 }
 
 .wordmark-name {
@@ -91,8 +102,12 @@
   color: var(--ink-muted);
   text-decoration: none;
   position: relative;
-  padding: 0.4rem 0;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 0.25rem;
   transition: color var(--transition-fast);
+  touch-action: manipulation;
 }
 
 .navbar-link:hover {
@@ -107,7 +122,7 @@
 /* Active Underline Indicator */
 .navbar-active-indicator {
   position: absolute;
-  bottom: 0;
+  bottom: 4px;
   left: 0;
   right: 0;
   height: 2px;
@@ -115,18 +130,21 @@
   border-radius: 1px;
 }
 
-/* Mobile Toggle Button */
+/* Mobile Toggle Button — 44x44px touch target */
 .navbar-mobile-toggle {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 44px;
   height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   border: none;
   background: transparent;
   color: var(--ink);
   cursor: pointer;
   border-radius: 4px;
+  touch-action: manipulation;
   transition: background-color var(--transition-fast);
 }
 
@@ -145,18 +163,19 @@
   outline-offset: 2px;
 }
 
-/* Mobile Navigation Full-Viewport Panel */
+/* Mobile Navigation Full-Viewport Panel — Solid Ivory, dvh, safe areas */
 .navbar-mobile-dropdown {
   position: fixed;
-  top: 64px;
+  top: calc(64px + var(--sat));
   left: 0;
   right: 0;
   bottom: 0;
-  height: calc(100vh - 64px);
+  height: calc(100dvh - 64px - var(--sat));
   background-color: var(--bg);
-  border-top: 1px solid var(--ink-faint);
+  border-top: 1px solid var(--border-medium);
   z-index: 99;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 @media (min-width: 768px) {
@@ -168,23 +187,25 @@
 .mobile-nav-content {
   display: flex;
   flex-direction: column;
-  padding: 2.5rem 1.5rem;
-  gap: 1.5rem;
+  padding: 2rem 1.5rem calc(3rem + var(--sab));
+  gap: 1.25rem;
 }
 
 .mobile-navbar-link {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 0;
+  min-height: 48px;
+  padding: 0.85rem 0;
   font-family: var(--font-serif);
-  font-size: clamp(2rem, 8vw, 2.75rem);
+  font-size: clamp(1.85rem, 7vw, 2.5rem);
   font-weight: 400;
   line-height: 1.1;
   letter-spacing: -0.02em;
   color: var(--ink-muted);
   text-decoration: none;
   border-bottom: 1px solid var(--border-hairline);
+  touch-action: manipulation;
   transition: color var(--transition-fast), padding-left var(--transition-fast);
 }
 
@@ -200,14 +221,15 @@
 
 .mobile-navbar-link.active {
   color: var(--ink);
+  font-weight: 500;
 }
 
 .mobile-active-dot {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background-color: var(--accent);
-  border: 1px solid var(--ink);
+  border: 1.5px solid var(--accent-ink);
 }
 
 
@@ -1284,7 +1306,6 @@
    4. ABOUT SECTION — NOTEBOOK MARGIN COMPOSITION
    -------------------------------------------------- */
 
-/* ── Section container: relative for absolute ghost numeral ── */
 .about-section {
   padding-top: clamp(5.5rem, 10vw, 8.5rem);
   padding-bottom: clamp(5.5rem, 10vw, 8.5rem);
@@ -1292,36 +1313,56 @@
   overflow: hidden;
 }
 
-/* ── Paper Grain Texture (SVG feTurbulence, scoped to About only) ── */
+/* Paper Grain Texture */
 .about-grain-texture {
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  /* Grayscale noise at 4% opacity — barely-there paper feel */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='0.04'/%3E%3C/svg%3E");
 }
 
-
-/* ── Container inside section stays above grain layer ── */
 .about-container {
   position: relative;
   z-index: 1;
 }
 
-/* ── Wayfinding label ── */
-.about-label-wrapper {
-  margin-bottom: clamp(1.75rem, 3.5vw, 2.75rem);
+/* ── Wayfinding number row (02 / About ————) ── */
+.about-wayfinding-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: clamp(2.25rem, 4.5vw, 3.5rem);
 }
 
-.about-wayfinding-label {
+.about-eyebrow-number {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--accent-ink);
+  background-color: var(--accent);
+  padding: 1px 6px 2px;
+  border-radius: 3px;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+
+.about-eyebrow-label {
   font-family: var(--font-sans);
   font-size: 0.8125rem;
   font-weight: 500;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: var(--ink-faint);
-  display: inline-block;
+  color: var(--ink-muted);
+  flex-shrink: 0;
+}
+
+.about-eyebrow-rule {
+  flex: 1;
+  height: 1px;
+  background-color: var(--border-hairline);
+  min-width: 24px;
 }
 
 /* ── Two-column asymmetric grid ── */
@@ -1366,7 +1407,7 @@
   }
 }
 
-/* ── Hand-drawn SVG accent mark — wraps "build" in lede ── */
+/* ── Hand-drawn SVG accent mark ── */
 .about-mark-wrapper {
   position: relative;
   display: inline-block;
@@ -1375,7 +1416,6 @@
 
 .about-hand-drawn-svg {
   position: absolute;
-  /* Below the word baseline, spanning the full word width */
   bottom: -8px;
   left: -3px;
   width: calc(100% + 6px);
@@ -1390,6 +1430,7 @@
   flex-direction: column;
   gap: 1.25rem;
   max-width: 60ch;
+  margin-bottom: clamp(1.75rem, 3.5vw, 2.75rem);
 }
 
 .about-body-p {
@@ -1399,15 +1440,67 @@
   color: var(--ink-muted);
 }
 
-/* ── Right column: pinned notes scatter area ── */
+/* ── Context Rail (horizontal definition rows) ── */
+.about-context-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+  max-width: 60ch;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--border-hairline);
+}
+
+.about-rail-row {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.about-rail-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  flex-shrink: 0;
+  width: 6.5rem;
+}
+
+.about-rail-value {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--ink-muted);
+  margin: 0;
+}
+
+@media (max-width: 480px) {
+  .about-rail-row {
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.7rem 0;
+  }
+
+  .about-rail-label {
+    width: auto;
+  }
+}
+
+/* ── Right column: notes area ── */
 .about-notes-area {
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
+  gap: 1rem;
 }
 
 @media (min-width: 900px) {
   .about-notes-area {
-    /* Slight downward offset so cards overlap the paragraph baseline visually */
     margin-top: 1.25rem;
   }
 }
@@ -1422,17 +1515,15 @@
 
 @media (min-width: 900px) {
   .about-notes-cluster {
-    /* At desktop, let cards pile slightly — negative margin creates loose overlap */
     gap: 0.75rem 0.6rem;
   }
 }
 
-/* ── Individual pinned cards (paper-toned, no soft shadow) ── */
+/* ── Individual pinned cards ── */
 .about-pinned-card {
   background-color: var(--bg-raised);
   border: 1px solid var(--ink-faint);
   padding: 0.95rem 1.1rem 0.85rem;
-  /* Single-pixel offset "pin shadow" — sharp, not blurred */
   box-shadow: 2px 2px 0px rgba(22, 21, 15, 0.07);
   border-radius: 2px;
   display: flex;
@@ -1442,11 +1533,9 @@
   gap: 0.3rem;
   cursor: grab;
   user-select: none;
-  /* Width per card — compact note proportions */
   min-width: 120px;
   max-width: 145px;
   position: relative;
-  /* transform-origin center for hover straighten to feel natural */
   transform-origin: center;
 }
 
@@ -1454,24 +1543,24 @@
   cursor: grabbing;
 }
 
-/* Small "pin" detail at top center of each card */
+/* Lime-tipped push-pin */
 .about-card-pin {
   position: absolute;
   top: -5px;
   left: 50%;
   transform: translateX(-50%);
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background-color: var(--ink-faint);
-  border: 1px solid var(--ink-muted);
+  background-color: var(--accent);
+  border: 1px solid var(--accent-ink);
   z-index: 2;
 }
 
 .about-card-title {
   font-family: var(--font-sans);
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 650;
   line-height: 1.3;
   color: var(--ink);
 }
@@ -1483,7 +1572,23 @@
   color: var(--ink-muted);
 }
 
-/* ── Mobile: two-column card grid with reduced overlap ── */
+/* Handwritten drag hint */
+.about-notes-aside {
+  font-family: var(--font-handwriting);
+  font-size: 0.875rem;
+  color: var(--ink-faint);
+  margin: 0;
+  padding-left: 0.25rem;
+  line-height: 1;
+}
+
+@media (hover: none) {
+  .about-notes-aside {
+    display: none;
+  }
+}
+
+/* Mobile: two-column card grid */
 @media (max-width: 899px) {
   .about-notes-cluster {
     display: grid;
@@ -1499,7 +1604,7 @@
 }
 
 /* --------------------------------------------------
-   5. SKILLS & TOOLKIT SECTION (Direction A — Flowing Toolkit)
+   5. SKILLS & TOOLKIT SECTION (Flowing Toolkit)
    -------------------------------------------------- */
 .skills-section {
   position: relative;
@@ -1511,19 +1616,64 @@
   position: relative;
 }
 
-/* ── Section wayfinding heading ── */
-.skills-label-wrapper {
-  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+/* ── Wayfinding number row (03 / Skills & toolkit ————) ── */
+.skills-wayfinding-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
 }
 
-.skills-wayfinding-label {
+.skills-eyebrow-number {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--accent-ink);
+  background-color: var(--accent);
+  padding: 1px 6px 2px;
+  border-radius: 3px;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+
+.skills-eyebrow-label {
   font-family: var(--font-sans);
   font-size: 0.8125rem;
   font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
   color: var(--ink-muted);
-  letter-spacing: 0;
-  text-transform: none;
   margin: 0;
+  flex-shrink: 0;
+}
+
+.skills-eyebrow-rule {
+  flex: 1;
+  height: 1px;
+  background-color: var(--border-hairline);
+  min-width: 24px;
+}
+
+/* ── Display headline: serif italic ── */
+.skills-display-line {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(2rem, 4.5vw, 3.25rem);
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
+  color: var(--ink);
+  margin: 0 0 clamp(0.5rem, 1vw, 0.75rem);
+}
+
+/* ── Interaction hint — small mono ── */
+.skills-interaction-hint {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+  margin: 0 0 clamp(2.5rem, 5vw, 4rem);
 }
 
 /* ── Flowing words container ── */
@@ -1590,7 +1740,7 @@
   color: var(--ink);
 }
 
-/* ── Lime underline — only on hover/active state ── */
+/* ── Lime underline ── */
 .skills-word-underline {
   position: absolute;
   bottom: -4px;
@@ -1606,7 +1756,7 @@
   bottom: -3px;
 }
 
-/* ── Honest context line ── */
+/* ── Honest context tooltip ── */
 .skills-word-context {
   position: absolute;
   top: calc(100% + 8px);
@@ -1632,30 +1782,28 @@
   top: calc(100% + 6px);
 }
 
-/* ── Divider between tiers ── */
-.skills-divider-wrapper {
+/* ── Three-part tier divider ── */
+.skills-tier-break {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
   margin: clamp(3rem, 6vw, 4.5rem) 0 clamp(2rem, 4vw, 3rem);
 }
 
-.skills-tier-divider {
-  border: none;
-  border-top: 1px solid var(--border-hairline);
-  margin: 0;
-  width: 100%;
+.skills-tier-break-rule {
+  flex: 1;
+  height: 1px;
+  background-color: var(--border-hairline);
+  min-width: 16px;
 }
 
-/* ── Currently learning label ── */
-.skills-learning-label-wrapper {
-  margin-bottom: clamp(1.25rem, 2.5vw, 1.75rem);
-}
-
-.skills-learning-label {
-  font-family: var(--font-sans);
-  font-size: 0.875rem;
+.skills-tier-break-label {
+  font-family: var(--font-handwriting);
+  font-size: 1rem;
   font-weight: 500;
   color: var(--ink-muted);
-  text-transform: none;
-  letter-spacing: 0;
+  white-space: nowrap;
+  line-height: 1;
 }
 
 /* --------------------------------------------------

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { personalInfo } from '../data/portfolioData';
 
@@ -38,22 +38,55 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Handle escape key and body scroll lock for mobile menu
+  // Body scroll lock with preserved scroll position & escape key handling
   useEffect(() => {
+    if (!mobileMenuOpen) return;
+
+    const scrollY = window.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && mobileMenuOpen) {
+      if (e.key === 'Escape') {
+        setMobileMenuOpen(false);
+      } else if (e.key === 'Tab') {
+        // Focus trap inside mobile nav and toggle button
+        const navEl = document.getElementById('mobile-nav-dropdown');
+        const toggleBtn = document.querySelector('.navbar-mobile-toggle');
+        if (!navEl) return;
+        const focusable = [toggleBtn, ...Array.from(navEl.querySelectorAll('a, button'))].filter(Boolean);
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    const handleClickOutside = (e) => {
+      const header = document.querySelector('.portfolio-navbar');
+      if (header && !header.contains(e.target)) {
         setMobileMenuOpen(false);
       }
     };
-    if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+
     window.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('click', handleClickOutside);
+
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      window.scrollTo(0, scrollY);
       window.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('click', handleClickOutside);
     };
   }, [mobileMenuOpen]);
 
@@ -75,7 +108,7 @@ export default function Navbar() {
 
   return (
     <header 
-      className={`portfolio-navbar ${isScrolled ? 'is-scrolled' : 'is-top'}`}
+      className={`portfolio-navbar ${mobileMenuOpen ? 'is-menu-open' : isScrolled ? 'is-scrolled' : 'is-top'}`}
       role="banner"
     >
       <div className="container navbar-inner">
@@ -104,14 +137,8 @@ export default function Navbar() {
               >
                 <span>{item.label}</span>
                 {isActive && (
-                  <motion.span
+                  <span
                     className="navbar-active-indicator"
-                    layoutId={shouldReduceMotion ? undefined : "navbarActiveIndicator"}
-                    transition={{
-                      type: "spring",
-                      stiffness: 380,
-                      damping: 30
-                    }}
                     aria-hidden="true"
                   />
                 )}
@@ -135,7 +162,7 @@ export default function Navbar() {
       {/* Mobile Navigation Dropdown */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.nav
+          <m.nav
             id="mobile-nav-dropdown"
             className="navbar-mobile-dropdown"
             aria-label="Mobile Main Navigation"
@@ -144,7 +171,7 @@ export default function Navbar() {
             exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -10 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
           >
-            <div className="container mobile-nav-content">
+            <div className="container mobile-nav-content" data-lenis-prevent="true">
               {navItems.map((item) => {
                 const isActive = activeSection === item.id;
                 return (
@@ -163,7 +190,7 @@ export default function Navbar() {
                 );
               })}
             </div>
-          </motion.nav>
+          </m.nav>
         )}
       </AnimatePresence>
     </header>

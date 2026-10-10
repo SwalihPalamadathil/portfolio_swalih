@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { X, ArrowUp } from 'lucide-react';
 
 const MOBILE_BREAKPOINT = 768;
@@ -36,7 +36,7 @@ function SpeechScribbleDoodle({ shouldReduceMotion }) {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <motion.path
+      <m.path
         d="M 6.8 9.5 C 9 7.2, 11.2 11.8, 13.8 9.2 C 15.8 7.2, 17.8 11.2, 19.5 9"
         className="hero-chat-scribble-stroke"
         fill="none"
@@ -58,7 +58,7 @@ function SpeechScribbleDoodle({ shouldReduceMotion }) {
               }
         }
       />
-      <motion.path
+      <m.path
         d="M 8 13.5 C 10.5 12.4, 13 14, 16 13"
         className="hero-chat-scribble-stroke-sub"
         fill="none"
@@ -91,17 +91,17 @@ function ThinkingDots({ shouldReduceMotion }) {
 
   return (
     <span className="hero-chat-thinking-wrap" aria-label="Thinking">
-      <motion.span
+      <m.span
         className="hero-chat-dot"
         animate={{ opacity: [0.3, 1, 0.3], y: [0, -3, 0] }}
         transition={{ duration: 0.8, repeat: Infinity, ease: 'easeInOut', delay: 0 }}
       />
-      <motion.span
+      <m.span
         className="hero-chat-dot"
         animate={{ opacity: [0.3, 1, 0.3], y: [0, -3, 0] }}
         transition={{ duration: 0.8, repeat: Infinity, ease: 'easeInOut', delay: 0.18 }}
       />
-      <motion.span
+      <m.span
         className="hero-chat-dot"
         animate={{ opacity: [0.3, 1, 0.3], y: [0, -3, 0] }}
         transition={{ duration: 0.8, repeat: Infinity, ease: 'easeInOut', delay: 0.36 }}
@@ -421,7 +421,7 @@ export default function HeroChat() {
               </span>
               <span className="hero-chat-detail-viewport">
                 <AnimatePresence mode="wait">
-                  <motion.span
+                  <m.span
                     key={promptIndex}
                     className="hero-chat-detail-text"
                     initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 3 }}
@@ -430,7 +430,7 @@ export default function HeroChat() {
                     transition={{ duration: shouldReduceMotion ? 0.05 : 0.28, ease: 'easeOut' }}
                   >
                     {ROTATING_PROMPTS[promptIndex]}
-                  </motion.span>
+                  </m.span>
                 </AnimatePresence>
               </span>
             </span>
@@ -450,7 +450,7 @@ export default function HeroChat() {
               <div className="hero-chat-portal-wrapper">
                 {/* Mobile backdrop (tapping closes sheet; desktop stays interactive without backdrop) */}
                 {isMobile && (
-                  <motion.div
+                  <m.div
                     className="hero-chat-backdrop"
                     onClick={closeChat}
                     initial={{ opacity: 0 }}
@@ -461,7 +461,7 @@ export default function HeroChat() {
                   />
                 )}
 
-                <motion.div
+                <m.div
                   ref={panelRef}
                   id="hero-ai-chat-panel"
                   role="dialog"
@@ -535,7 +535,7 @@ export default function HeroChat() {
 
                     {/* Messages Stream */}
                     {messages.map((m) => (
-                      <motion.div
+                      <m.div
                         key={m.id}
                         className={`hero-chat-bubble-row is-${m.role}`}
                         initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 6 }}
@@ -548,7 +548,7 @@ export default function HeroChat() {
                         <div className="hero-chat-bubble-content">
                           {m.text}
                         </div>
-                      </motion.div>
+                      </m.div>
                     ))}
 
                     {/* Assistant Thinking Indicator */}
@@ -582,7 +582,7 @@ export default function HeroChat() {
                   {/* Floating "New message ↓" Chip if User Scrolled Up */}
                   <AnimatePresence>
                     {showScrollBottomBtn && (
-                      <motion.button
+                      <m.button
                         type="button"
                         className="hero-chat-scroll-bottom-btn"
                         onClick={() => scrollToBottom(true)}
@@ -593,7 +593,7 @@ export default function HeroChat() {
                         aria-label="Scroll to newest message"
                       >
                         <span>New message ↓</span>
-                      </motion.button>
+                      </m.button>
                     )}
                   </AnimatePresence>
 
@@ -646,7 +646,7 @@ export default function HeroChat() {
                       </div>
                     </div>
                   )}
-                </motion.div>
+                </m.div>
               </div>
             )}
           </AnimatePresence>,

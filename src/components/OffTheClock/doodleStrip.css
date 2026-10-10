@@ -1,0 +1,196 @@
+/* ==========================================================================
+   DOODLE STRIP — Compact Self-Contained Notebook Margin Note
+   ========================================================================== */
+
+.doodle-strip {
+  position: relative;
+  width: 100%;
+  margin: 48px 0;
+  box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+  .doodle-strip {
+    margin: 32px 0;
+  }
+}
+
+/* Slim Paper Card */
+.doodle-strip-card {
+  position: relative;
+  width: 100%;
+  background-color: #FAF7EE;
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 23px,
+    rgba(22, 21, 15, 0.035) 24px
+  );
+  border: 1px solid rgba(22, 21, 15, 0.12);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px -4px rgba(22, 21, 15, 0.06), 0 1px 3px rgba(22, 21, 15, 0.04);
+  padding: 14px 20px 16px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Small Washi Tape Corner */
+.doodle-strip-tape {
+  position: absolute;
+  top: -7px;
+  right: 24px;
+  width: 44px;
+  height: 14px;
+  z-index: 2;
+  pointer-events: none;
+  background: rgba(198, 242, 78, 0.78);
+  transform: rotate(3.5deg);
+  border-left: 2px dashed rgba(22, 21, 15, 0.12);
+  border-right: 2px dashed rgba(22, 21, 15, 0.12);
+  box-shadow: 0 1px 2px rgba(22, 21, 15, 0.06);
+}
+
+/* Handwritten Heading (One line, ~20px) */
+.doodle-strip-header {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.doodle-strip-title {
+  font-family: var(--font-handwriting, 'Caveat', cursive);
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--ink);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Desktop: ONE single row of 8 doodles */
+.doodle-strip-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
+  align-items: start;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Tablet (641px to 900px): Clean 2 rows of 4 */
+@media (max-width: 900px) and (min-width: 641px) {
+  .doodle-strip-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px 14px;
+  }
+}
+
+/* Phone (<= 640px): Compact 2 rows of 3 */
+@media (max-width: 640px) {
+  .doodle-strip-card {
+    padding: 12px 14px 14px;
+  }
+
+  .doodle-strip-header {
+    margin-bottom: 8px;
+  }
+
+  .doodle-strip-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px 8px;
+  }
+
+  .doodle-strip-item.hide-mobile {
+    display: none;
+  }
+}
+
+/* Doodle Card Item */
+.doodle-strip-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  min-width: 0;
+  padding: 2px;
+  border-radius: 4px;
+}
+
+.doodle-strip-svg-wrap {
+  width: 58px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .doodle-strip-svg-wrap {
+    width: 52px;
+    height: 52px;
+  }
+}
+
+.doodle-strip-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Handwritten label under doodle */
+.doodle-strip-label {
+  font-family: var(--font-handwriting, 'Caveat', cursive);
+  font-size: 14px;
+  line-height: 1.15;
+  color: var(--ink);
+  margin-top: 4px;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.doodle-label-short {
+  display: none;
+}
+
+.doodle-label-full {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .doodle-strip-label {
+    font-size: 13.5px;
+    line-height: 1.1;
+  }
+
+  .doodle-label-full {
+    display: none;
+  }
+
+  .doodle-label-short {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+    width: 100%;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .doodle-strip-item {
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
+import { m, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 import { timelineData } from '../data/portfolioData';
 
 function TimelineDoodle({ type }) {
@@ -194,7 +194,7 @@ export default function Experience() {
             xmlns="http://www.w3.org/2000/svg"
             aria-hidden="true"
           >
-            <motion.path
+            <m.path
               d="M 10 0 C 14 60, 6 120, 10 180 C 14 240, 6 300, 10 360 C 14 420, 6 480, 10 540 C 14 600, 6 660, 10 720 C 14 780, 6 840, 10 900 C 14 960, 8 990, 10 1000"
               stroke="var(--accent)"
               strokeWidth="2.5"
@@ -208,7 +208,7 @@ export default function Experience() {
           {/* Timeline Sequence */}
           <div className="trail-list" role="list">
             {timelineData.map((item) => (
-              <motion.article
+              <m.article
                 key={item.id}
                 className="trail-entry"
                 variants={entryVariants}
@@ -259,7 +259,7 @@ export default function Experience() {
                     </div>
                   )}
                 </div>
-              </motion.article>
+              </m.article>
             ))}
           </div>
         </div>

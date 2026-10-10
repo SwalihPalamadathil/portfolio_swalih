@@ -269,46 +269,27 @@
   border: 1px solid rgba(22, 21, 15, 0.08);
 }
 
-/* Strict CSS Grid for "The Wall" */
+/* Flexible Centered Layout for "The Wall" (Centers trailing items in last row for ANY N) */
 .otc-wall-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: var(--wall-col-gap);
-  row-gap: var(--wall-row-gap);
-  align-items: stretch;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--wall-row-gap) var(--wall-col-gap);
+  --wall-col-gap: 24px;
+  --wall-row-gap: 32px;
 }
 
 @media (min-width: 900px) {
   .otc-wall-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
     --wall-col-gap: 36px;
     --wall-row-gap: 46px;
-  }
-
-  /* Centering the last row (cards 13 & 14) in 3-column layout */
-  .otc-wall-grid > .otc-wall-cell:nth-child(13) {
-    margin-left: calc(50% + var(--wall-col-gap) / 2);
-  }
-  .otc-wall-grid > .otc-wall-cell:nth-child(14) {
-    margin-left: calc(50% + var(--wall-col-gap) / 2);
   }
 }
 
 @media (min-width: 1280px) {
   .otc-wall-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
     --wall-col-gap: 40px;
     --wall-row-gap: 50px;
-  }
-
-  /* Reset 3-column offset, then center cards 13 & 14 in 4-column layout */
-  .otc-wall-grid > .otc-wall-cell:nth-child(13) {
-    grid-column-start: 2;
-    margin-left: 0;
-  }
-  .otc-wall-grid > .otc-wall-cell:nth-child(14) {
-    grid-column-start: 3;
-    margin-left: 0;
   }
 }
 
@@ -319,6 +300,21 @@
   flex-direction: column;
   padding: 14px; /* Protected cell margin: rotation & hover never breach cell boundary */
   box-sizing: border-box;
+  width: calc((100% - var(--wall-col-gap)) / 2);
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+@media (min-width: 900px) {
+  .otc-wall-cell {
+    width: calc((100% - 2 * var(--wall-col-gap)) / 3);
+  }
+}
+
+@media (min-width: 1280px) {
+  .otc-wall-cell {
+    width: calc((100% - 3 * var(--wall-col-gap)) / 4);
+  }
 }
 
 /* Inner Polaroid Card: deterministic tilt, paper frame, identical outer size */
@@ -981,374 +977,10 @@
 }
 
 /* --------------------------------------------------------------------------
-   8. Doodle Corner + Sketchpad: ONE Open Notebook Spread
-   -------------------------------------------------------------------------- */
-.otc-notebook-spread {
-  position: relative;
-  background-color: #FAF7EE;
-  background-image: repeating-linear-gradient(
-    transparent,
-    transparent 27px,
-    rgba(22, 21, 15, 0.035) 28px
-  );
-  border: 1px solid rgba(22, 21, 15, 0.14);
-  border-radius: 12px;
-  box-shadow: 0 16px 36px -8px rgba(22, 21, 15, 0.1), 0 2px 6px rgba(22, 21, 15, 0.04);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-@media (min-width: 900px) {
-  .otc-notebook-spread {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: stretch;
-  }
-}
-
-/* Corner washi tape on notebook spread */
-.otc-notebook-tape {
-  position: absolute;
-  top: -8px;
-  width: 64px;
-  height: 18px;
-  z-index: 5;
-  pointer-events: none;
-  opacity: 0.88;
-}
-
-.otc-notebook-tape-tl {
-  left: 20px;
-  transform: rotate(-10deg);
-  background: rgba(198, 242, 78, 0.85);
-  border-left: 2px dashed rgba(22, 21, 15, 0.12);
-  border-right: 2px dashed rgba(22, 21, 15, 0.12);
-}
-
-.otc-notebook-tape-tr {
-  right: 20px;
-  transform: rotate(8deg);
-  background: rgba(239, 235, 225, 0.95);
-  border-left: 2px dashed rgba(22, 21, 15, 0.12);
-  border-right: 2px dashed rgba(22, 21, 15, 0.12);
-}
-
-/* Center spine shadow (visible on two-page desktop spread) */
-.otc-notebook-spine {
-  display: none;
-}
-
-@media (min-width: 900px) {
-  .otc-notebook-spine {
-    display: block;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 50%;
-    width: 28px;
-    transform: translateX(-50%);
-    pointer-events: none;
-    z-index: 3;
-    background: linear-gradient(
-      to right,
-      rgba(22, 21, 15, 0.03) 0%,
-      rgba(22, 21, 15, 0.08) 50%,
-      rgba(22, 21, 15, 0.03) 100%
-    );
-  }
-}
-
-/* Notebook Pages */
-.otc-notebook-page {
-  padding: 2rem 1.75rem 2.25rem;
-  box-sizing: border-box;
-}
-
-.otc-notebook-page-left {
-  border-bottom: 1px dashed var(--border-medium);
-}
-
-@media (min-width: 900px) {
-  .otc-notebook-page-left {
-    border-bottom: none;
-    border-right: 1px dashed rgba(22, 21, 15, 0.12);
-    padding: 2.25rem 2.25rem 2.5rem;
-  }
-}
-
-.otc-notebook-page-right {
-  display: flex;
-  flex-direction: column;
-}
-
-@media (min-width: 900px) {
-  .otc-notebook-page-right {
-    padding: 2.25rem 2.25rem 2.5rem;
-    height: 100%;
-  }
-}
-
-/* Left Page: Doodle Header & Sticky Note */
-.otc-doodle-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-}
-
-.otc-doodle-title {
-  font-family: var(--font-serif);
-  font-size: clamp(1.4rem, 2vw, 1.75rem);
-  font-weight: 400;
-  color: var(--ink);
-  margin: 0;
-  line-height: 1.25;
-}
-
-.otc-sticky-washi-note {
-  font-family: var(--font-handwriting);
-  font-size: 1.05rem;
-  color: var(--ink);
-  background: rgba(198, 242, 78, 0.55);
-  border-left: 3px solid var(--accent-ink);
-  padding: 0.35rem 0.65rem;
-  border-radius: 2px;
-  transform: rotate(-1.5deg);
-  white-space: nowrap;
-}
-
-/* 8 Doodles in a Clean 2-Column Grid */
-.otc-doodles-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem 1.25rem;
-}
-
-.otc-doodle-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 0.65rem 0.5rem;
-  background: rgba(255, 255, 255, 0.45);
-  border: 1px solid rgba(22, 21, 15, 0.06);
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.otc-doodle-card:hover {
-  background: rgba(255, 255, 255, 0.85);
-  box-shadow: 0 4px 12px rgba(22, 21, 15, 0.06);
-}
-
-.otc-doodle-svg-wrap {
-  width: 88px;
-  height: 88px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.otc-doodle-svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-.otc-doodle-label {
-  font-family: var(--font-handwriting);
-  font-size: 1.15rem;
-  color: var(--ink);
-  line-height: 1.15;
-  margin-top: 0.35rem;
-  max-width: 140px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-align: center;
-}
-
-/* Mobile: hide 2 flagged doodles ("send help" and "page not found, me neither") */
-@media (max-width: 640px) {
-  .otc-doodle-hide-mobile {
-    display: none;
-  }
-}
-
-/* Right Page: Interactive Sketchpad */
-.otc-sketchpad-header {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-bottom: 0.85rem;
-}
-
-.otc-sketchpad-title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.otc-sketchpad-title {
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--ink);
-  margin: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.otc-sketchpad-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-/* Color Swatches */
-.otc-swatches-group {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 3px 5px;
-  background: rgba(22, 21, 15, 0.04);
-  border-radius: 20px;
-}
-
-.otc-color-pill {
-  width: 22px;
-  height: 22px;
-  min-width: 22px;
-  min-height: 22px;
-  border-radius: 50%;
-  border: 2px solid transparent;
-  cursor: pointer;
-  transition: transform 0.15s ease, border-color 0.15s ease;
-}
-
-.otc-color-pill:hover {
-  transform: scale(1.12);
-}
-
-.otc-color-pill.is-active {
-  border-color: #FFFFFF;
-  box-shadow: 0 0 0 2px var(--ink);
-}
-
-/* Brush Sizes */
-.otc-sizes-group {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  background: rgba(22, 21, 15, 0.04);
-  border-radius: 4px;
-  padding: 2px;
-}
-
-.otc-size-btn {
-  background: transparent;
-  border: none;
-  border-radius: 3px;
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: var(--ink-muted);
-  cursor: pointer;
-  padding: 0.35rem 0.55rem;
-  min-height: 32px;
-  transition: all 0.15s ease;
-}
-
-.otc-size-btn.is-active {
-  background: #FFFFFF;
-  color: var(--ink);
-  font-weight: 600;
-  box-shadow: 0 1px 2px rgba(22, 21, 15, 0.08);
-}
-
-/* Stamps Bar */
-.otc-stamps-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  margin-bottom: 0.85rem;
-  flex-wrap: wrap;
-}
-
-.otc-stamps-label {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: var(--ink-muted);
-  text-transform: uppercase;
-  margin-right: 2px;
-}
-
-.otc-stamp-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  padding: 0.35rem 0.65rem;
-  background: #FFFFFF;
-  border: 1px dashed var(--border-medium);
-  border-radius: 4px;
-  color: var(--ink);
-  cursor: pointer;
-  min-height: 36px;
-  transition: background 0.15s ease, border-color 0.15s ease;
-}
-
-.otc-stamp-btn:hover {
-  background: var(--bg-raised);
-  border-color: var(--ink);
-}
-
-/* Canvas Wrapper: stretches to equal height of left page on desktop */
-.otc-canvas-wrap {
-  position: relative;
-  flex: 1;
-  min-height: 280px;
-  width: 100%;
-}
-
-.otc-canvas-hint {
-  position: absolute;
-  top: 14px;
-  left: 16px;
-  pointer-events: none;
-  font-family: var(--font-handwriting);
-  font-size: 1.25rem;
-  color: var(--ink-faint);
-  user-select: none;
-  z-index: 1;
-}
-
-/* Canvas: touch-action: none is strictly applied ONLY to canvas */
-.otc-drawing-canvas {
-  width: 100%;
-  height: 100%;
-  display: block;
-  touch-action: none;
-  background: #FAF7EE;
-  border: 1px dashed rgba(22, 21, 15, 0.18);
-  border-radius: 6px;
-  cursor: crosshair;
-}
-
-/* --------------------------------------------------------------------------
-   9. Reduced Motion Overrides
+   8. Reduced Motion Overrides
    -------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   .otc-polaroid-card,
-  .otc-doodle-card,
   .otc-icon-btn,
   .otc-toggle-btn {
     transform: none !important;
@@ -1360,3 +992,4 @@
     transform: none !important;
   }
 }
+
