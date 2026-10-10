@@ -951,6 +951,26 @@
   opacity: 0.9;
 }
 
+/* Error Boundary inline fallback (shown inside chat area only on render crash) */
+.hero-chat-eb-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.75rem 0.9rem;
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: 6px;
+  margin: 0.5rem 0;
+}
+
+.hero-chat-eb-text {
+  font-size: 0.82rem;
+  color: #991b1b;
+  line-height: 1.45;
+  margin: 0;
+}
+
 /* Floating "New message ↓" Button */
 .hero-chat-scroll-bottom-btn {
   position: sticky;

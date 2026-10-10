@@ -3,6 +3,7 @@ import { m, useReducedMotion } from 'framer-motion';
 import { ArrowDownRight, Download, Check } from 'lucide-react';
 import { personalInfo } from '../data/portfolioData';
 import HeroChat from '../components/HeroChat';
+import { ChatErrorBoundary } from '../components/ErrorBoundary';
 import resumeUrl from '../assets/MUHAMMED_SWALIH_P_FlowCV_Resume_2026-09-12 (1).pdf';
 
 export default function Hero() {
@@ -127,8 +128,12 @@ export default function Hero() {
           </m.div>
 
           {/* 6. Grounded AI Visitor Note ("the sticky note that talks back") */}
+          {/* ChatErrorBoundary: any crash shows a friendly message ONLY inside
+              the chat area — Hero section and the rest of the page are unaffected */}
           <m.div variants={itemVariants} className="hero-chat-container">
-            <HeroChat />
+            <ChatErrorBoundary>
+              <HeroChat />
+            </ChatErrorBoundary>
           </m.div>
         </m.div>
 

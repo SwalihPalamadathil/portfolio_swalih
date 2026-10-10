@@ -3,6 +3,8 @@ import { createPortal } from 'react-dom';
 import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { X, ArrowUp } from 'lucide-react';
 
+const REQUEST_TIMEOUT_MS = 25000; // 25 s abort timeout
+
 const MOBILE_BREAKPOINT = 768;
 
 const STARTER_QUESTIONS = [
@@ -149,6 +151,8 @@ export default function HeroChat() {
   const scrollYRef = useRef(0);
   const idCounterRef = useRef(0);
   const isNearBottomRef = useRef(true);
+  // Track the active AbortController so we can cancel on unmount or close
+  const abortControllerRef = useRef(null);
 
   // Rotate micro-copy every 4.5s when idle and before first interaction
   useEffect(() => {
@@ -252,7 +256,13 @@ export default function HeroChat() {
   };
 
   const closeChat = () => {
+    // Abort any inflight request when the panel closes
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
     setIsExpanded(false);
+    setIsLoading(false);
     // Verification check: ensure window.scrollY is exactly preserved
     requestAnimationFrame(() => {
       const currentScroll = window.scrollY || window.pageYOffset || 0;
@@ -262,6 +272,15 @@ export default function HeroChat() {
       triggerRef.current?.focus({ preventScroll: true });
     });
   };
+
+  // Abort inflight requests on component unmount
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
 
   // Keyboard navigation & Esc / Focus trap
   useEffect(() => {
@@ -294,7 +313,8 @@ export default function HeroChat() {
     return () => window.removeEventListener('keydown', handleKeyDownGlobal);
   }, [isExpanded, isMobile]);
 
-  // API Message Send Logic (AI logic, prompt payload and keys preserved strictly)
+  // API Message Send Logic — hardened with AbortController, timeout, content-type
+  // guard, response shape validation, and friendly error messages for every failure mode.
   const handleSendMessage = async (textToSend) => {
     const query = (textToSend || input).trim();
     if (!query || isLoading || isRateLimited) return;
@@ -312,52 +332,112 @@ export default function HeroChat() {
     setMessages(updatedMessages);
     setIsLoading(true);
 
+    // Cancel any previous inflight request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    // Timeout: abort after REQUEST_TIMEOUT_MS
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
     try {
-      // Build short history payload (exclude IDs)
-      const historyPayload = messages.slice(-5).map((m) => ({
-        role: m.role,
-        text: m.text
+      // Build short history payload (exclude IDs) — renamed loop var to avoid
+      // shadowing the `m` import from framer-motion
+      const historyPayload = messages.slice(-5).map((msg) => ({
+        role: msg.role,
+        text: msg.text
       }));
 
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: query,
-          history: historyPayload
-        })
-      });
+      let res;
+      try {
+        res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: query, history: historyPayload }),
+          signal: controller.signal
+        });
+      } catch (fetchErr) {
+        // Network offline, timeout abort, or DNS failure
+        if (fetchErr && fetchErr.name === 'AbortError') {
+          // Aborted by timeout or by closing the panel — don't show error if panel closed
+          if (!controller.signal.aborted || abortControllerRef.current !== controller) {
+            setErrorNotice('The request timed out. Please try again.');
+          }
+        } else if (!navigator.onLine) {
+          setErrorNotice("You're offline. Please check your connection and try again.");
+        } else {
+          setErrorNotice("Couldn't reach the server. Please try again.");
+        }
+        return;
+      }
 
-      const data = await res.json();
+      // Guard: check Content-Type before attempting JSON parse.
+      // A missing /api route returns HTML 404 — parsing that throws and crashes.
+      const contentType = res.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        console.error('[HeroChat] Non-JSON response from /api/chat:', res.status, contentType);
+        if (res.status === 404) {
+          setErrorNotice('The chat endpoint was not found (404). Please contact Muhammed directly at swalihpalamadathil@gmail.com.');
+        } else {
+          setErrorNotice("I'm having trouble connecting right now. Please feel free to email Muhammed directly at swalihpalamadathil@gmail.com.");
+        }
+        return;
+      }
+
+      let data;
+      try {
+        data = await res.json();
+      } catch (parseErr) {
+        console.error('[HeroChat] JSON parse error:', parseErr);
+        setErrorNotice("Received an unexpected response. Please try again.");
+        return;
+      }
 
       if (res.status === 429) {
         setIsRateLimited(true);
         setErrorNotice(
-          data.message ||
-            "You've reached the conversation limit for this session. Feel free to connect directly with Muhammed via email at swalihpalamadathil@gmail.com!"
+          (typeof data?.message === 'string' ? data.message : null) ||
+          (typeof data?.reply === 'string' ? data.reply : null) ||
+          "You've reached the conversation limit for this session. Feel free to connect directly with Muhammed via email at swalihpalamadathil@gmail.com!"
         );
+      } else if (res.status >= 500) {
+        setErrorNotice("The assistant is having a problem right now. Please try again in a moment.");
       } else if (!res.ok) {
         setErrorNotice(
-          data.message ||
-            "I'm having trouble connecting right now. Please feel free to email Muhammed directly at swalihpalamadathil@gmail.com."
+          (typeof data?.message === 'string' ? data.message : null) ||
+          "I'm having trouble connecting right now. Please feel free to email Muhammed directly at swalihpalamadathil@gmail.com."
         );
-      } else if (data.reply) {
-        idCounterRef.current += 1;
-        const botMessage = {
-          role: 'assistant',
-          text: data.reply,
-          id: `bot-${idCounterRef.current}`
-        };
-        setMessages([...updatedMessages, botMessage]);
+      } else {
+        // Validate response shape: expect { reply: string }
+        const replyText = typeof data?.reply === 'string' ? data.reply.trim() : '';
+        if (!replyText) {
+          setErrorNotice("I got an empty response. Please try asking again.");
+        } else {
+          idCounterRef.current += 1;
+          const botMessage = {
+            role: 'assistant',
+            text: replyText,
+            id: `bot-${idCounterRef.current}`
+          };
+          setMessages([...updatedMessages, botMessage]);
+        }
       }
     } catch (err) {
-      console.error('Chat error:', err);
-      setErrorNotice(
-        "I couldn't reach the server just now. You can email Muhammed directly at swalihpalamadathil@gmail.com."
-      );
+      // Catch-all: never let any error propagate to React render
+      console.error('[HeroChat] Unexpected chat error:', err);
+      if (err && err.name !== 'AbortError') {
+        setErrorNotice("I couldn't get an answer just now. You can email Muhammed directly at swalihpalamadathil@gmail.com.");
+      }
     } finally {
+      clearTimeout(timeoutId);
+      // Only clear the ref if this controller is still the active one
+      if (abortControllerRef.current === controller) {
+        abortControllerRef.current = null;
+      }
       setIsLoading(false);
-      textareaRef.current?.focus({ preventScroll: true });
+      try { textareaRef.current?.focus({ preventScroll: true }); } catch {}
     }
   };
 
@@ -534,19 +614,22 @@ export default function HeroChat() {
                     )}
 
                     {/* Messages Stream */}
-                    {messages.map((m) => (
+                    {/* IMPORTANT: loop var renamed `msg` to avoid shadowing the
+                        framer-motion `m` import — shadowing caused m.div to be
+                        undefined inside the callback, crashing the render tree */}
+                    {messages.map((msg) => (
                       <m.div
-                        key={m.id}
-                        className={`hero-chat-bubble-row is-${m.role}`}
+                        key={msg.id}
+                        className={`hero-chat-bubble-row is-${msg.role}`}
                         initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 6 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: shouldReduceMotion ? 0.05 : 0.2 }}
                       >
                         <div className="hero-chat-bubble-label">
-                          {m.role === 'user' ? 'You' : 'Swalih (Assistant)'}
+                          {msg.role === 'user' ? 'You' : 'Swalih (Assistant)'}
                         </div>
                         <div className="hero-chat-bubble-content">
-                          {m.text}
+                          {typeof msg.text === 'string' ? msg.text : ''}
                         </div>
                       </m.div>
                     ))}
