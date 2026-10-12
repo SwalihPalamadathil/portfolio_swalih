@@ -16,77 +16,10 @@ const STARTER_QUESTIONS = [
 ];
 
 const ROTATING_PROMPTS = [
-  "about CamMap, skills, or experience",
-  "what Swalih is currently learning",
-  "or just say hi!"
+  "About CamMap, skills, or my experience",
+  "What Swalih is currently learning",
+  "Or just say hi!"
 ];
-
-// Hand-drawn speech-scribble doodle mark for the resting trigger card
-function SpeechScribbleDoodle({ shouldReduceMotion }) {
-  return (
-    <svg
-      className="hero-chat-speech-doodle"
-      viewBox="0 0 26 24"
-      width="22"
-      height="20"
-      fill="none"
-      aria-hidden="true"
-    >
-      <path
-        d="M 3.2 5.5 C 3 3.8, 4.4 2.4, 7.2 2.2 C 13.5 1.8, 19.2 2.1, 22.4 2.8 C 24.2 3.3, 24.8 4.8, 24.6 7.4 C 24.3 10.8, 24.4 13.5, 23 15.6 C 21.8 17.2, 19.6 17.5, 15.5 17.5 L 12.8 21.5 C 12.1 22.5, 10.8 22, 11.2 20.5 L 11.8 17.5 C 7 17.4, 4.6 16.9, 3.5 15.2 C 2.3 13.2, 2.6 9.5, 3.2 5.5 Z"
-        className="hero-chat-bubble-outline"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <m.path
-        d="M 6.8 9.5 C 9 7.2, 11.2 11.8, 13.8 9.2 C 15.8 7.2, 17.8 11.2, 19.5 9"
-        className="hero-chat-scribble-stroke"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        animate={
-          shouldReduceMotion
-            ? { pathLength: 1, opacity: 1 }
-            : {
-                pathLength: [0, 1, 1, 0],
-                opacity: [0.35, 1, 1, 0.35],
-                transition: {
-                  duration: 4.4,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                  times: [0, 0.45, 0.85, 1]
-                }
-              }
-        }
-      />
-      <m.path
-        d="M 8 13.5 C 10.5 12.4, 13 14, 16 13"
-        className="hero-chat-scribble-stroke-sub"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.35"
-        strokeLinecap="round"
-        animate={
-          shouldReduceMotion
-            ? { pathLength: 1, opacity: 0.85 }
-            : {
-                pathLength: [0, 1, 1, 0],
-                opacity: [0.2, 0.85, 0.85, 0.2],
-                transition: {
-                  duration: 4.4,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                  times: [0.15, 0.55, 0.85, 1]
-                }
-              }
-        }
-      />
-    </svg>
-  );
-}
 
 function ThinkingDots({ shouldReduceMotion }) {
   if (shouldReduceMotion) {
@@ -461,13 +394,13 @@ export default function HeroChat() {
   return (
     <>
       {/* =========================================================================
-          HERO INLINE TRIGGER CARD (Never changes size or pushes page content)
+          HERO INLINE TRIGGER CARD (Tactile 3D Robot Assistant Gadget Card)
           ========================================================================= */}
       <div className="hero-chat-container">
         <button
           ref={triggerRef}
           type="button"
-          className={`hero-chat-resting-note ${isExpanded ? 'is-active-trigger' : ''}`}
+          className={`swai-gadget-card ${isExpanded ? 'is-active-trigger' : ''}`}
           onClick={openChat}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
@@ -478,45 +411,53 @@ export default function HeroChat() {
           aria-haspopup="dialog"
           aria-controls="hero-ai-chat-panel"
         >
-          {/* Hand-drawn Irregular Border SVG Frame */}
-          <svg
-            className="hero-chat-frame-svg"
-            viewBox="0 0 100 100"
-            preserveAspectRatio="none"
-            aria-hidden="true"
-          >
-            <path
-              d="M 2 3 C 26 1.4, 74 2.2, 98 2.8 C 98.8 25, 98.2 75, 98.4 97 C 74 98.2, 26 97.4, 1.8 97.2 C 2.4 75, 1.4 25, 2 3 Z"
-              vectorEffect="non-scaling-stroke"
-              className="hero-chat-frame-path"
-            />
-          </svg>
+          {/* Left: 3D Robot Mascot Avatar Pod */}
+          <div className="swai-gadget-avatar-pod" aria-hidden="true">
+            <div className="swai-gadget-avatar-float">
+              <SwaiAvatar size={62} className="swai-gadget-avatar-img" />
+              <span className="swai-gadget-antenna-halo" />
+            </div>
+            <span className="swai-gadget-ambient-shadow" />
+          </div>
 
-          <span className="hero-chat-resting-content">
-            <span className="hero-chat-resting-icon" aria-hidden="true">
-              <SpeechScribbleDoodle shouldReduceMotion={shouldReduceMotion} />
-            </span>
-            <span className="hero-chat-resting-copy">
-              <span className="hero-chat-invite-row">
-                <span className="hero-chat-invite-title">{HERO_CARD_TITLE}</span>
-                <span className="hero-chat-prompt-chevron" aria-hidden="true">›</span>
+          {/* Right: Copy & Interactivity */}
+          <div className="swai-gadget-text-block">
+            <div className="swai-gadget-header-row">
+              <span className="swai-gadget-title">{HERO_CARD_TITLE}</span>
+              <span className="swai-gadget-arrow" aria-hidden="true">
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="swai-gadget-arrow-icon"
+                >
+                  <path
+                    d="M 3 8 H 13 M 9 4 L 13 8 L 9 12"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
               </span>
-              <span className="hero-chat-detail-viewport">
-                <AnimatePresence mode="wait">
-                  <m.span
-                    key={promptIndex}
-                    className="hero-chat-detail-text"
-                    initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 3 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: shouldReduceMotion ? 0 : -3 }}
-                    transition={{ duration: shouldReduceMotion ? 0.05 : 0.28, ease: 'easeOut' }}
-                  >
-                    {ROTATING_PROMPTS[promptIndex]}
-                  </m.span>
-                </AnimatePresence>
-              </span>
-            </span>
-          </span>
+            </div>
+            <div className="swai-gadget-detail-viewport">
+              <AnimatePresence mode="wait">
+                <m.span
+                  key={promptIndex}
+                  className="swai-gadget-detail-text"
+                  initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 3 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: shouldReduceMotion ? 0 : -3 }}
+                  transition={{ duration: shouldReduceMotion ? 0.05 : 0.28, ease: 'easeOut' }}
+                >
+                  {ROTATING_PROMPTS[promptIndex]}
+                </m.span>
+              </AnimatePresence>
+            </div>
+          </div>
         </button>
       </div>
 
