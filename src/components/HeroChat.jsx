@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { X, ArrowUp } from 'lucide-react';
+import { ASSISTANT_NAME, ASSISTANT_SUBTITLE, HERO_CARD_TITLE } from '../data/chat';
+import SwaiAvatar from './SwaiAvatar';
 
 const REQUEST_TIMEOUT_MS = 25000; // 25 s abort timeout
 
@@ -15,7 +17,7 @@ const STARTER_QUESTIONS = [
 
 const ROTATING_PROMPTS = [
   "about CamMap, skills, or experience",
-  "what I'm currently learning",
+  "what Swalih is currently learning",
   "or just say hi!"
 ];
 
@@ -379,9 +381,9 @@ export default function HeroChat() {
       if (!contentType.includes('application/json')) {
         console.error('[HeroChat] Non-JSON response from /api/chat:', res.status, contentType);
         if (res.status === 404) {
-          setErrorNotice('The chat endpoint was not found (404). Please contact Muhammed directly at swalihpalamadathil@gmail.com.');
+          setErrorNotice('The chat endpoint was not found (404). Please contact Swalih directly at swalihpalamadathil@gmail.com.');
         } else {
-          setErrorNotice("I'm having trouble connecting right now. Please feel free to email Muhammed directly at swalihpalamadathil@gmail.com.");
+          setErrorNotice(`${ASSISTANT_NAME} is having trouble connecting right now. Please feel free to email Swalih directly at swalihpalamadathil@gmail.com.`);
         }
         return;
       }
@@ -400,14 +402,14 @@ export default function HeroChat() {
         setErrorNotice(
           (typeof data?.message === 'string' ? data.message : null) ||
           (typeof data?.reply === 'string' ? data.reply : null) ||
-          "You've reached the conversation limit for this session. Feel free to connect directly with Muhammed via email at swalihpalamadathil@gmail.com!"
+          "You've reached the conversation limit for this session. Feel free to connect directly with Swalih via email at swalihpalamadathil@gmail.com!"
         );
       } else if (res.status >= 500) {
-        setErrorNotice("The assistant is having a problem right now. Please try again in a moment.");
+        setErrorNotice(`${ASSISTANT_NAME} is taking a short break. Please try again soon.`);
       } else if (!res.ok) {
         setErrorNotice(
           (typeof data?.message === 'string' ? data.message : null) ||
-          "I'm having trouble connecting right now. Please feel free to email Muhammed directly at swalihpalamadathil@gmail.com."
+          `${ASSISTANT_NAME} is having trouble connecting right now. Please feel free to email Swalih directly at swalihpalamadathil@gmail.com.`
         );
       } else {
         // Validate response shape: expect { reply: string }
@@ -428,7 +430,7 @@ export default function HeroChat() {
       // Catch-all: never let any error propagate to React render
       console.error('[HeroChat] Unexpected chat error:', err);
       if (err && err.name !== 'AbortError') {
-        setErrorNotice("I couldn't get an answer just now. You can email Muhammed directly at swalihpalamadathil@gmail.com.");
+        setErrorNotice(`${ASSISTANT_NAME} couldn't get an answer just now. You can email Swalih directly at swalihpalamadathil@gmail.com.`);
       }
     } finally {
       clearTimeout(timeoutId);
@@ -471,7 +473,7 @@ export default function HeroChat() {
           onMouseLeave={() => setIsHovered(false)}
           onFocus={() => setIsHovered(true)}
           onBlur={() => setIsHovered(false)}
-          aria-label="Ask me anything about my work — click to open chat"
+          aria-label={`Ask ${ASSISTANT_NAME} anything about Swalih's work — click to open chat`}
           aria-expanded={isExpanded}
           aria-haspopup="dialog"
           aria-controls="hero-ai-chat-panel"
@@ -496,7 +498,7 @@ export default function HeroChat() {
             </span>
             <span className="hero-chat-resting-copy">
               <span className="hero-chat-invite-row">
-                <span className="hero-chat-invite-title">Ask me anything</span>
+                <span className="hero-chat-invite-title">{HERO_CARD_TITLE}</span>
                 <span className="hero-chat-prompt-chevron" aria-hidden="true">›</span>
               </span>
               <span className="hero-chat-detail-viewport">
@@ -546,7 +548,7 @@ export default function HeroChat() {
                   id="hero-ai-chat-panel"
                   role="dialog"
                   aria-modal={isMobile ? 'true' : 'false'}
-                  aria-label="Ask Swalih anything"
+                  aria-label={`Ask ${ASSISTANT_NAME} anything`}
                   data-lenis-prevent="true"
                   className={`hero-chat-fixed-panel ${isMobile ? 'is-mobile-sheet' : 'is-desktop-floating'}`}
                   initial={
@@ -571,14 +573,17 @@ export default function HeroChat() {
                 >
                   {/* Header Bar */}
                   <div className="hero-chat-panel-header">
-                    <div className="hero-chat-header-text">
-                      <div className="hero-chat-header-title-row">
-                        <span className="hero-chat-header-dot" aria-hidden="true" />
-                        <h3 className="hero-chat-panel-title">Ask Swalih anything</h3>
+                    <div className="hero-chat-header-main">
+                      <SwaiAvatar size={40} className="hero-chat-header-avatar" />
+                      <div className="hero-chat-header-text">
+                        <div className="hero-chat-header-title-row">
+                          <span className="hero-chat-header-dot" aria-hidden="true" />
+                          <h3 className="hero-chat-panel-title">{ASSISTANT_NAME}</h3>
+                        </div>
+                        <p className="hero-chat-panel-subtitle">
+                          {ASSISTANT_SUBTITLE}
+                        </p>
                       </div>
-                      <p className="hero-chat-panel-subtitle">
-                        Grounded in my portfolio data &amp; projects
-                      </p>
                     </div>
 
                     <button
@@ -604,11 +609,11 @@ export default function HeroChat() {
                     {messages.length === 0 && (
                       <div className="hero-chat-empty-intro">
                         <div className="hero-chat-empty-icon" aria-hidden="true">
-                          <SpeechScribbleDoodle shouldReduceMotion={shouldReduceMotion} />
+                          <SwaiAvatar size={44} />
                         </div>
-                        <h4 className="hero-chat-empty-title">Hi! What would you like to know?</h4>
+                        <h4 className="hero-chat-empty-title">Hi, I&apos;m {ASSISTANT_NAME}</h4>
                         <p className="hero-chat-empty-text">
-                          I can tell you about CamMap, Muhammed&apos;s frontend skills, internship experience, or academic background.
+                          Swalih&apos;s AI assistant. Ask me about Swalih&apos;s projects, skills or experience.
                         </p>
                       </div>
                     )}
@@ -617,29 +622,64 @@ export default function HeroChat() {
                     {/* IMPORTANT: loop var renamed `msg` to avoid shadowing the
                         framer-motion `m` import — shadowing caused m.div to be
                         undefined inside the callback, crashing the render tree */}
-                    {messages.map((msg) => (
-                      <m.div
-                        key={msg.id}
-                        className={`hero-chat-bubble-row is-${msg.role}`}
-                        initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 6 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: shouldReduceMotion ? 0.05 : 0.2 }}
-                      >
-                        <div className="hero-chat-bubble-label">
-                          {msg.role === 'user' ? 'You' : 'Swalih (Assistant)'}
-                        </div>
-                        <div className="hero-chat-bubble-content">
-                          {typeof msg.text === 'string' ? msg.text : ''}
-                        </div>
-                      </m.div>
-                    ))}
+                    {messages.map((msg, index) => {
+                      const isAssistant = msg.role === 'assistant';
+                      const isFirstInAssistantGroup =
+                        isAssistant && (index === 0 || messages[index - 1].role !== 'assistant');
+
+                      return (
+                        <m.div
+                          key={msg.id}
+                          className={`hero-chat-bubble-row is-${msg.role}`}
+                          initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: shouldReduceMotion ? 0.05 : 0.2 }}
+                        >
+                          {isAssistant ? (
+                            <div className="hero-chat-bubble-with-avatar">
+                              <div className="hero-chat-avatar-slot" aria-hidden="true">
+                                {isFirstInAssistantGroup ? (
+                                  <SwaiAvatar size={32} />
+                                ) : (
+                                  <span className="hero-chat-avatar-spacer" />
+                                )}
+                              </div>
+                              <div className="hero-chat-bubble-body">
+                                <div className="hero-chat-bubble-label">
+                                  <span className="hero-chat-assistant-name">{ASSISTANT_NAME}</span>
+                                </div>
+                                <div className="hero-chat-bubble-content">
+                                  {typeof msg.text === 'string' ? msg.text : ''}
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="hero-chat-bubble-label">You</div>
+                              <div className="hero-chat-bubble-content">
+                                {typeof msg.text === 'string' ? msg.text : ''}
+                              </div>
+                            </>
+                          )}
+                        </m.div>
+                      );
+                    })}
 
                     {/* Assistant Thinking Indicator */}
                     {isLoading && (
                       <div className="hero-chat-bubble-row is-assistant is-thinking-row">
-                        <div className="hero-chat-bubble-label">Swalih (Assistant)</div>
-                        <div className="hero-chat-bubble-content is-thinking-bubble">
-                          <ThinkingDots shouldReduceMotion={shouldReduceMotion} />
+                        <div className="hero-chat-bubble-with-avatar">
+                          <div className="hero-chat-avatar-slot" aria-hidden="true">
+                            <SwaiAvatar size={28} />
+                          </div>
+                          <div className="hero-chat-bubble-body">
+                            <div className="hero-chat-bubble-label">
+                              <span className="hero-chat-assistant-name">{ASSISTANT_NAME}</span>
+                            </div>
+                            <div className="hero-chat-bubble-content is-thinking-bubble">
+                              <ThinkingDots shouldReduceMotion={shouldReduceMotion} />
+                            </div>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -714,7 +754,7 @@ export default function HeroChat() {
                           maxLength={500}
                           rows={1}
                           disabled={isLoading}
-                          aria-label="Ask a question about Muhammed"
+                          aria-label="Ask a question about Swalih"
                         />
 
                         <button

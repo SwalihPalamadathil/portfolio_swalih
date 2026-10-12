@@ -35,7 +35,7 @@ export class ChatErrorBoundary extends React.Component {
       return (
         <div className="hero-chat-eb-fallback" role="alert">
           <p className="hero-chat-eb-text">
-            The assistant hit a problem. Please try again.
+            swAI hit a problem. Please try again.
           </p>
           <button
             type="button"
