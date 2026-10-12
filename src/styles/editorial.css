@@ -514,6 +514,7 @@
   -webkit-tap-highlight-color: transparent;
   max-width: 440px;
   width: 100%;
+  contain: layout style;
   box-shadow: 
     0 1px 2px rgba(22, 21, 15, 0.04),
     0 4px 12px rgba(22, 21, 15, 0.05),
@@ -580,6 +581,7 @@
   animation: swaiRobotFloat 4.2s ease-in-out infinite;
   transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
   z-index: 1;
+  will-change: transform;
 }
 
 .swai-gadget-avatar-img.swai-avatar {
@@ -621,6 +623,7 @@
   z-index: 3;
   animation: swaiAntennaPulse 3s ease-in-out infinite;
   transition: opacity 0.3s ease, filter 0.3s ease, transform 0.3s ease;
+  will-change: transform, opacity;
 }
 
 .swai-gadget-card:hover .swai-gadget-antenna-halo {
@@ -643,6 +646,7 @@
   z-index: 0;
   animation: swaiShadowPulse 4.2s ease-in-out infinite;
   transition: transform 0.35s ease, opacity 0.3s ease;
+  will-change: transform, opacity;
 }
 
 .swai-gadget-card:hover .swai-gadget-ambient-shadow {
@@ -796,6 +800,7 @@
   .swai-gadget-antenna-halo,
   .swai-gadget-ambient-shadow {
     animation: none !important;
+    will-change: auto;
   }
 
   .swai-gadget-card,

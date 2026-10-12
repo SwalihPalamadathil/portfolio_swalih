@@ -208,7 +208,7 @@ export default function PhotoBooth() {
                 transition={{ duration: shouldReduceMotion ? 0.05 : 0.3 }}
               >
                 <m.div
-                  className="otc-pile-interactive-btn"
+                  className={`otc-pile-interactive-btn${shouldReduceMotion ? '' : ' otc-pile-breathing'}`}
                   role="button"
                   tabIndex={0}
                   aria-expanded={false}
@@ -220,19 +220,6 @@ export default function PhotoBooth() {
                       openCollection();
                     }
                   }}
-                  animate={
-                    shouldReduceMotion
-                      ? {}
-                      : {
-                          rotate: [-0.6, 0.8, -0.6],
-                          scale: [1, 1.015, 1],
-                          transition: {
-                            duration: 4,
-                            repeat: Infinity,
-                            ease: 'easeInOut'
-                          }
-                        }
-                  }
                   whileTap={shouldReduceMotion ? {} : { scale: 0.97 }}
                 >
                   <div className="otc-pile-card-stack" aria-hidden="true">

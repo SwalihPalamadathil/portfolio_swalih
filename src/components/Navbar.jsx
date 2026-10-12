@@ -18,24 +18,45 @@ export default function Navbar() {
   const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
-    const handleScroll = () => {
-      // Toggle scrolled state
-      setIsScrolled(window.scrollY > 20);
+    // Track whether a rAF tick is pending so we only queue one per frame
+    let rafId = null;
 
-      // Detect active section
-      const scrollPosition = window.scrollY + 140;
+    const computeScrollState = () => {
+      rafId = null;
+      const scrollY = window.scrollY;
+
+      // Toggle scrolled state (only update when value changes)
+      setIsScrolled((prev) => {
+        const next = scrollY > 20;
+        return prev === next ? prev : next;
+      });
+
+      // Detect active section (single DOM read pass)
+      const scrollPosition = scrollY + 140;
       for (let i = navItems.length - 1; i >= 0; i--) {
         const element = document.getElementById(navItems[i].id);
         if (element && element.offsetTop <= scrollPosition) {
-          setActiveSection(navItems[i].id);
+          setActiveSection((prev) =>
+            prev === navItems[i].id ? prev : navItems[i].id
+          );
           break;
         }
       }
     };
 
+    const handleScroll = () => {
+      if (rafId !== null) return; // already queued
+      rafId = requestAnimationFrame(computeScrollState);
+    };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
+    // Run once immediately to set correct initial state
+    computeScrollState();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+    };
   }, []);
 
   // Body scroll lock with preserved scroll position & escape key handling

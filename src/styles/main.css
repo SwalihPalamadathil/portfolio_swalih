@@ -153,3 +153,18 @@ img {
     scroll-behavior: auto !important;
   }
 }
+
+/* Performance: skip rendering below-fold sections until near-viewport.
+   contain-intrinsic-size prevents CLS by reserving approximate height.
+   Applied to editorial-section (About, Skills, Work, Experience, Contact)
+   but NOT hero (#hero) since it's the LCP element above the fold. */
+.editorial-section:not(#hero) {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 500px;
+}
+
+/* OffTheClock section uses its own class */
+.otc-section {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 700px;
+}

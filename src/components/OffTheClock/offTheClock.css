@@ -993,3 +993,26 @@
   }
 }
 
+/* --------------------------------------------------------------------------
+   9. Mobile Pile Breathing Animation (CSS — lighter than FM repeat:Infinity)
+   -------------------------------------------------------------------------- */
+@keyframes otcPileBreathe {
+  0%, 100% {
+    transform: rotate(-0.6deg) scale(1);
+  }
+  50% {
+    transform: rotate(0.8deg) scale(1.015);
+  }
+}
+
+.otc-pile-breathing {
+  animation: otcPileBreathe 4s ease-in-out infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .otc-pile-breathing {
+    animation: none !important;
+    will-change: auto;
+  }
+}

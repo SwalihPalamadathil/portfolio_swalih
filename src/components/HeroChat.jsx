@@ -1,9 +1,38 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { createPortal } from 'react-dom';
+/**
+ * HeroChat — Lean resting gadget card + lazy chat overlay.
+ *
+ * Split strategy:
+ *   • This file (HeroChat.jsx) stays in the initial bundle — just the
+ *     3D robot card, all state, and all logic. No heavy JSX DOM tree.
+ *   • ChatOverlay.jsx is lazy-loaded on first open and pre-fetched on
+ *     hover/focus so the chunk is in cache by the time the user clicks.
+ *
+ * Constraints preserved:
+ *   - Opening/sending never scrolls the page (scrollYRef + restore)
+ *   - Mobile sheet + keyboard height via visualViewport
+ *   - Body-scroll lock on mobile only
+ *   - AbortController + 25s timeout on every request
+ *   - Rate-limit + error handling
+ *   - Esc key / focus trap
+ *   - Suggestion chips hidden after first message
+ *   - React.Suspense fallback = null (portal not visible until loaded anyway)
+ */
+
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  Suspense,
+  lazy
+} from 'react';
 import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { X, ArrowUp } from 'lucide-react';
-import { ASSISTANT_NAME, ASSISTANT_SUBTITLE, HERO_CARD_TITLE } from '../data/chat';
+import { ASSISTANT_NAME, HERO_CARD_TITLE } from '../data/chat';
 import SwaiAvatar from './SwaiAvatar';
+
+// Lazy-load the heavy chat overlay portal — only fetched when isExpanded → true.
+// The dynamic import also pre-fetches on button hover/focus (see prefetchOverlay).
+const ChatOverlay = lazy(() => import('./ChatOverlay'));
 
 const REQUEST_TIMEOUT_MS = 25000; // 25 s abort timeout
 
@@ -21,30 +50,14 @@ const ROTATING_PROMPTS = [
   "Or just say hi!"
 ];
 
-function ThinkingDots({ shouldReduceMotion }) {
-  if (shouldReduceMotion) {
-    return <span className="hero-chat-thinking-static">thinking…</span>;
-  }
-
-  return (
-    <span className="hero-chat-thinking-wrap" aria-label="Thinking">
-      <m.span
-        className="hero-chat-dot"
-        animate={{ opacity: [0.3, 1, 0.3], y: [0, -3, 0] }}
-        transition={{ duration: 0.8, repeat: Infinity, ease: 'easeInOut', delay: 0 }}
-      />
-      <m.span
-        className="hero-chat-dot"
-        animate={{ opacity: [0.3, 1, 0.3], y: [0, -3, 0] }}
-        transition={{ duration: 0.8, repeat: Infinity, ease: 'easeInOut', delay: 0.18 }}
-      />
-      <m.span
-        className="hero-chat-dot"
-        animate={{ opacity: [0.3, 1, 0.3], y: [0, -3, 0] }}
-        transition={{ duration: 0.8, repeat: Infinity, ease: 'easeInOut', delay: 0.36 }}
-      />
-    </span>
-  );
+// Pre-fetch ChatOverlay chunk without rendering it (hover/focus hint)
+let overlayPrefetched = false;
+function prefetchOverlay() {
+  if (overlayPrefetched) return;
+  overlayPrefetched = true;
+  // Dynamic import with no assignment triggers the network request so the
+  // chunk is in disk-cache before the user clicks
+  import('./ChatOverlay').catch(() => {});
 }
 
 export default function HeroChat() {
@@ -278,8 +291,7 @@ export default function HeroChat() {
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
     try {
-      // Build short history payload (exclude IDs) — renamed loop var to avoid
-      // shadowing the `m` import from framer-motion
+      // Build short history payload (exclude IDs)
       const historyPayload = messages.slice(-5).map((msg) => ({
         role: msg.role,
         text: msg.text
@@ -296,7 +308,6 @@ export default function HeroChat() {
       } catch (fetchErr) {
         // Network offline, timeout abort, or DNS failure
         if (fetchErr && fetchErr.name === 'AbortError') {
-          // Aborted by timeout or by closing the panel — don't show error if panel closed
           if (!controller.signal.aborted || abortControllerRef.current !== controller) {
             setErrorNotice('The request timed out. Please try again.');
           }
@@ -309,7 +320,6 @@ export default function HeroChat() {
       }
 
       // Guard: check Content-Type before attempting JSON parse.
-      // A missing /api route returns HTML 404 — parsing that throws and crashes.
       const contentType = res.headers.get('content-type') || '';
       if (!contentType.includes('application/json')) {
         console.error('[HeroChat] Non-JSON response from /api/chat:', res.status, contentType);
@@ -395,6 +405,7 @@ export default function HeroChat() {
     <>
       {/* =========================================================================
           HERO INLINE TRIGGER CARD (Tactile 3D Robot Assistant Gadget Card)
+          Always in the initial bundle — never lazy-loaded.
           ========================================================================= */}
       <div className="hero-chat-container">
         <button
@@ -402,9 +413,9 @@ export default function HeroChat() {
           type="button"
           className={`swai-gadget-card ${isExpanded ? 'is-active-trigger' : ''}`}
           onClick={openChat}
-          onMouseEnter={() => setIsHovered(true)}
+          onMouseEnter={() => { setIsHovered(true); prefetchOverlay(); }}
           onMouseLeave={() => setIsHovered(false)}
-          onFocus={() => setIsHovered(true)}
+          onFocus={() => { setIsHovered(true); prefetchOverlay(); }}
           onBlur={() => setIsHovered(false)}
           aria-label={`Ask ${ASSISTANT_NAME} anything about Swalih's work — click to open chat`}
           aria-expanded={isExpanded}
@@ -462,260 +473,34 @@ export default function HeroChat() {
       </div>
 
       {/* =========================================================================
-          FIXED-POSITION CHAT OVERLAY VIA REACT PORTAL
-          Desktop: Floating Bottom-Right (400px), Mobile: Full-screen Sheet
-          Page layout and scroll position NEVER change
+          LAZY CHAT OVERLAY — only loaded & rendered when isExpanded becomes true.
+          Suspense fallback=null: the portal is invisible until JS is ready anyway.
           ========================================================================= */}
-      {typeof document !== 'undefined' &&
-        createPortal(
-          <AnimatePresence>
-            {isExpanded && (
-              <div className="hero-chat-portal-wrapper">
-                {/* Mobile backdrop (tapping closes sheet; desktop stays interactive without backdrop) */}
-                {isMobile && (
-                  <m.div
-                    className="hero-chat-backdrop"
-                    onClick={closeChat}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: shouldReduceMotion ? 0.05 : 0.2 }}
-                    aria-hidden="true"
-                  />
-                )}
-
-                <m.div
-                  ref={panelRef}
-                  id="hero-ai-chat-panel"
-                  role="dialog"
-                  aria-modal={isMobile ? 'true' : 'false'}
-                  aria-label={`Ask ${ASSISTANT_NAME} anything`}
-                  data-lenis-prevent="true"
-                  className={`hero-chat-fixed-panel ${isMobile ? 'is-mobile-sheet' : 'is-desktop-floating'}`}
-                  initial={
-                    isMobile
-                      ? { y: '100%' }
-                      : { opacity: 0, scale: shouldReduceMotion ? 1 : 0.94, y: 16 }
-                  }
-                  animate={
-                    isMobile
-                      ? { y: 0 }
-                      : { opacity: 1, scale: 1, y: 0 }
-                  }
-                  exit={
-                    isMobile
-                      ? { y: '100%' }
-                      : { opacity: 0, scale: shouldReduceMotion ? 1 : 0.94, y: 12 }
-                  }
-                  transition={{
-                    duration: shouldReduceMotion ? 0.05 : isMobile ? 0.3 : 0.25,
-                    ease: [0.22, 1, 0.36, 1]
-                  }}
-                >
-                  {/* Header Bar */}
-                  <div className="hero-chat-panel-header">
-                    <div className="hero-chat-header-main">
-                      <SwaiAvatar size={40} className="hero-chat-header-avatar" />
-                      <div className="hero-chat-header-text">
-                        <div className="hero-chat-header-title-row">
-                          <span className="hero-chat-header-dot" aria-hidden="true" />
-                          <h3 className="hero-chat-panel-title">{ASSISTANT_NAME}</h3>
-                        </div>
-                        <p className="hero-chat-panel-subtitle">
-                          {ASSISTANT_SUBTITLE}
-                        </p>
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      className="hero-chat-panel-close-btn"
-                      onClick={closeChat}
-                      aria-label="Close chat (Escape)"
-                    >
-                      <X size={18} aria-hidden="true" />
-                    </button>
-                  </div>
-
-                  {/* Messages Scroll Container (Scrolled ONLY within this container) */}
-                  <div
-                    ref={messagesContainerRef}
-                    className="hero-chat-messages-container"
-                    onScroll={handleMessagesScroll}
-                    data-lenis-prevent="true"
-                    aria-live="polite"
-                    aria-atomic="false"
-                  >
-                    {/* Empty State Welcome Intro */}
-                    {messages.length === 0 && (
-                      <div className="hero-chat-empty-intro">
-                        <div className="hero-chat-empty-icon" aria-hidden="true">
-                          <SwaiAvatar size={44} />
-                        </div>
-                        <h4 className="hero-chat-empty-title">Hi, I&apos;m {ASSISTANT_NAME}</h4>
-                        <p className="hero-chat-empty-text">
-                          Swalih&apos;s AI assistant. Ask me about Swalih&apos;s projects, skills or experience.
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Messages Stream */}
-                    {/* IMPORTANT: loop var renamed `msg` to avoid shadowing the
-                        framer-motion `m` import — shadowing caused m.div to be
-                        undefined inside the callback, crashing the render tree */}
-                    {messages.map((msg, index) => {
-                      const isAssistant = msg.role === 'assistant';
-                      const isFirstInAssistantGroup =
-                        isAssistant && (index === 0 || messages[index - 1].role !== 'assistant');
-
-                      return (
-                        <m.div
-                          key={msg.id}
-                          className={`hero-chat-bubble-row is-${msg.role}`}
-                          initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 6 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: shouldReduceMotion ? 0.05 : 0.2 }}
-                        >
-                          {isAssistant ? (
-                            <div className="hero-chat-bubble-with-avatar">
-                              <div className="hero-chat-avatar-slot" aria-hidden="true">
-                                {isFirstInAssistantGroup ? (
-                                  <SwaiAvatar size={32} />
-                                ) : (
-                                  <span className="hero-chat-avatar-spacer" />
-                                )}
-                              </div>
-                              <div className="hero-chat-bubble-body">
-                                <div className="hero-chat-bubble-label">
-                                  <span className="hero-chat-assistant-name">{ASSISTANT_NAME}</span>
-                                </div>
-                                <div className="hero-chat-bubble-content">
-                                  {typeof msg.text === 'string' ? msg.text : ''}
-                                </div>
-                              </div>
-                            </div>
-                          ) : (
-                            <>
-                              <div className="hero-chat-bubble-label">You</div>
-                              <div className="hero-chat-bubble-content">
-                                {typeof msg.text === 'string' ? msg.text : ''}
-                              </div>
-                            </>
-                          )}
-                        </m.div>
-                      );
-                    })}
-
-                    {/* Assistant Thinking Indicator */}
-                    {isLoading && (
-                      <div className="hero-chat-bubble-row is-assistant is-thinking-row">
-                        <div className="hero-chat-bubble-with-avatar">
-                          <div className="hero-chat-avatar-slot" aria-hidden="true">
-                            <SwaiAvatar size={28} />
-                          </div>
-                          <div className="hero-chat-bubble-body">
-                            <div className="hero-chat-bubble-label">
-                              <span className="hero-chat-assistant-name">{ASSISTANT_NAME}</span>
-                            </div>
-                            <div className="hero-chat-bubble-content is-thinking-bubble">
-                              <ThinkingDots shouldReduceMotion={shouldReduceMotion} />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Error Notice with Retry Button */}
-                    {errorNotice && (
-                      <div className="hero-chat-error-card" role="alert">
-                        <p className="hero-chat-error-text">{errorNotice}</p>
-                        {lastQuery && (
-                          <button
-                            type="button"
-                            className="hero-chat-retry-btn"
-                            onClick={() => handleSendMessage(lastQuery)}
-                            disabled={isLoading}
-                          >
-                            Try again
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Floating "New message ↓" Chip if User Scrolled Up */}
-                  <AnimatePresence>
-                    {showScrollBottomBtn && (
-                      <m.button
-                        type="button"
-                        className="hero-chat-scroll-bottom-btn"
-                        onClick={() => scrollToBottom(true)}
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 8 }}
-                        transition={{ duration: 0.16 }}
-                        aria-label="Scroll to newest message"
-                      >
-                        <span>New message ↓</span>
-                      </m.button>
-                    )}
-                  </AnimatePresence>
-
-                  {/* Starter Question Suggestions (Horizontal row, hidden after first message) */}
-                  {messages.length === 0 && (
-                    <div className="hero-chat-suggestions-bar" aria-label="Suggested starter questions">
-                      <div className="hero-chat-suggestions-scroll">
-                        {STARTER_QUESTIONS.map((q) => (
-                          <button
-                            key={q}
-                            type="button"
-                            className="hero-chat-suggestion-chip"
-                            onClick={() => handleSendMessage(q)}
-                            disabled={isLoading}
-                          >
-                            <span className="hero-chat-chip-tick">›</span>
-                            <span>{q}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Input Area (Pinned at bottom of panel, never shifts page) */}
-                  {!isRateLimited && (
-                    <div className="hero-chat-input-stage">
-                      <div className="hero-chat-input-wrapper">
-                        <textarea
-                          ref={textareaRef}
-                          className="hero-chat-textarea"
-                          placeholder="Ask a question… (Enter to send, Shift+Enter for new line)"
-                          value={input}
-                          onChange={handleTextareaChange}
-                          onKeyDown={handleKeyDownInput}
-                          maxLength={500}
-                          rows={1}
-                          disabled={isLoading}
-                          aria-label="Ask a question about Swalih"
-                        />
-
-                        <button
-                          type="button"
-                          className="hero-chat-send-action-btn"
-                          onClick={() => handleSendMessage()}
-                          disabled={isLoading || !input.trim()}
-                          aria-label="Send message"
-                        >
-                          <ArrowUp size={18} strokeWidth={2.4} aria-hidden="true" />
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </m.div>
-              </div>
-            )}
-          </AnimatePresence>,
-          document.body
-        )}
+      {isExpanded && (
+        <Suspense fallback={null}>
+          <ChatOverlay
+            isMobile={isMobile}
+            isExpanded={isExpanded}
+            messages={messages}
+            isLoading={isLoading}
+            errorNotice={errorNotice}
+            isRateLimited={isRateLimited}
+            input={input}
+            showScrollBottomBtn={showScrollBottomBtn}
+            closeChat={closeChat}
+            handleSendMessage={handleSendMessage}
+            handleTextareaChange={handleTextareaChange}
+            handleKeyDownInput={handleKeyDownInput}
+            handleMessagesScroll={handleMessagesScroll}
+            scrollToBottom={scrollToBottom}
+            messagesContainerRef={messagesContainerRef}
+            textareaRef={textareaRef}
+            panelRef={panelRef}
+            STARTER_QUESTIONS={STARTER_QUESTIONS}
+            lastQuery={lastQuery}
+          />
+        </Suspense>
+      )}
     </>
   );
 }

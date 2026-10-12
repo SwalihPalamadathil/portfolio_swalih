@@ -23,10 +23,23 @@
       Caveat: 400..700 (handwritten notes, kept full range — small font).
       display=swap: renders fallback immediately, swaps when font arrives.
     -->
+    <!--
+      Non-blocking font load: preload fires the network request immediately
+      without render-blocking. onload swaps rel to stylesheet once the CSS
+      arrives. The noscript fallback handles JS-disabled environments.
+    -->
     <link
+      rel="preload"
+      as="style"
       href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,600&display=swap"
-      rel="stylesheet"
+      onload="this.onload=null;this.rel='stylesheet'"
     />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,600&display=swap"
+      />
+    </noscript>
 
     <!-- Preload the LCP image (hero portrait): serves WebP on capable browsers -->
     <link
